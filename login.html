@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindEase - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7F81F5;
+            --secondary: #9B9DFF;
+            --accent: #FF6B35;
+            --light: #F8F9FF;
+            --dark: #2C3E50;
+            --success: #6bcf7f;
+            --error: #ff6b6b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: var(--primary);
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: var(--dark);
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .form-toggle {
+            display: flex;
+            background: var(--light);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 16px rgba(127, 129, 245, 0.3);
+        }
+
+        .form-container {
+            position: relative;
+        }
+
+        .form {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(127, 129, 245, 0.2);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(127, 129, 245, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(127, 129, 245, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--error);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(107, 207, 127, 0.1);
+            color: var(--success);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            border: 1px solid rgba(107, 207, 127, 0.2);
+            display: none;
+        }
+
+        .guest-login {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(127, 129, 245, 0.1);
+        }
+
+        .guest-btn {
+            background: none;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .guest-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🧠 MindEase</h1>
+            <p>Your AI Therapy Companion</p>
+        </div>
+
+        <div class="form-toggle">
+            <button class="toggle-btn active" onclick="showForm('login')">Login</button>
+            <button class="toggle-btn" onclick="showForm('register')">Register</button>
+        </div>
+
+        <div class="form-container">
+            <!-- Login Form -->
+            <form class="form active" id="login-form">
+                <div class="error-message" id="login-error"></div>
+                <div class="success-message" id="login-success"></div>
+                
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Login</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Logging in...</span>
+                    </div>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="form" id="register-form">
+                <div class="error-message" id="register-error"></div>
+                <div class="success-message" id="register-success"></div>
+                
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Create Account</span>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Creating account...</span>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <div class="guest-login">
+            <p>Or continue as a guest</p>
+            <button class="guest-btn" onclick="loginAsGuest()">Continue as Guest</button>
+        </div>
+    </div>
+
+    <script>
+        // Form toggle functionality
+        function showForm(formType) {
+            const forms = document.querySelectorAll('.form');
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+            
+            forms.forEach(form => form.classList.remove('active'));
+            toggleBtns.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`${formType}-form`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Clear messages
+            clearMessages();
+        }
+
+        // Clear error and success messages
+        function clearMessages() {
+            const messages = document.querySelectorAll('.error-message, .success-message');
+            messages.forEach(msg => {
+                msg.style.display = 'none';
+                msg.textContent = '';
+            });
+        }
+
+        // Show message
+        function showMessage(type, message, formId) {
+            const messageElement = document.getElementById(`${formId}-${type}`);
+            messageElement.textContent = message;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // Loading state
+        function setLoading(formId, isLoading) {
+            const form = document.getElementById(`${formId}-form`);
+            const btnText = form.querySelector('.btn-text');
+            const loading = form.querySelector('.loading');
+            const submitBtn = form.querySelector('.submit-btn');
+            
+            if (isLoading) {
+                btnText.style.display = 'none';
+                loading.style.display = 'block';
+                submitBtn.disabled = true;
+            } else {
+                btnText.style.display = 'block';
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // User management
+        class UserManager {
+            constructor() {
+                this.users = JSON.parse(localStorage.getItem('users') || '[]');
+                this.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            }
+
+            register(name, email, password) {
+                // Check if user already exists
+                if (this.users.find(user => user.email === email)) {
+                    throw new Error('User with this email already exists');
+                }
+
+                // Create new user
+                const newUser = {
+                    id: Date.now().toString(),
+                    name,
+                    email,
+                    password: this.hashPassword(password),
+                    createdAt: new Date().toISOString(),
+                    moodHistory: []
+                };
+
+                this.users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(this.users));
+                
+                return newUser;
+            }
+
+            login(email, password) {
+                const user = this.users.find(u => u.email === email);
+                
+                if (!user) {
+                    throw new Error('User not found');
+                }
+
+                if (user.password !== this.hashPassword(password)) {
+                    throw new Error('Invalid password');
+                }
+
+                this.currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                return user;
+            }
+
+            loginAsGuest() {
+                const guestUser = {
+                    id: 'guest',
+                    name: 'Guest User',
+                    email: 'guest@mindease.com',
+                    isGuest: true,
+                    createdAt: new Date().toISOString(),
+                    moodHistory: []
+                };
+
+                this.currentUser = guestUser;
+                localStorage.setItem('currentUser', JSON.stringify(guestUser));
+                
+                return guestUser;
+            }
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+            }
+
+            getCurrentUser() {
+                return this.currentUser;
+            }
+
+            updateMoodHistory(moodEntry) {
+                if (!this.currentUser) return;
+
+                if (!this.currentUser.moodHistory) {
+                    this.currentUser.moodHistory = [];
+                }
+
+                this.currentUser.moodHistory.push(moodEntry);
+                
+                // Update in localStorage
+                if (this.currentUser.isGuest) {
+                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                } else {
+                    const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        this.users[userIndex] = this.currentUser;
+                        localStorage.setItem('users', JSON.stringify(this.users));
+                    }
+                }
+            }
+
+            getMoodHistory() {
+                return this.currentUser ? this.currentUser.moodHistory || [] : [];
+            }
+
+            hashPassword(password) {
+                // Simple hash for demo purposes
+                // In production, use proper hashing like bcrypt
+                return btoa(password);
+            }
+        }
+
+        const userManager = new UserManager();
+
+        // Check if user is already logged in
+        if (userManager.getCurrentUser()) {
+            window.location.href = 'index.html';
+        }
+
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            setLoading('login', true);
+            
+            try {
+                const user = userManager.login(email, password);
+                showMessage('success', `Welcome back, ${user.name}!`, 'login');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } catch (error) {
+                showMessage('error', error.message, 'login');
+            } finally {
+                setLoading('login', false);
+            }
+        });
+
+        // Register form submission
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showMessage('error', 'Passwords do not match', 'register');
+                return;
+            }
+            
+            setLoading('register', true);
+            
+            try {
+                const user = userManager.register(name, email, password);
+                showMessage('success', `Account created successfully! Welcome, ${user.name}!`, 'register');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } catch (error) {
+                showMessage('error', error.message, 'register');
+            } finally {
+                setLoading('register', false);
+            }
+        });
+
+        // Guest login
+        function loginAsGuest() {
+            const user = userManager.loginAsGuest();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 

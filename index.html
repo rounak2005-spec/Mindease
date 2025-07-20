@@ -1,0 +1,4705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindEase - AI Therapy Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        #focus-pod-pane {
+            color:#333;
+    position: fixed;
+    top: 0;
+    left: -320px; /* Use left: -320px for left side */
+    width: 300px;
+    height: 100vh;
+    background: #f9f9ff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+
+/* Show the pane */
+#focus-pod-pane.active {
+    left: 0;
+}
+
+#focus-pod-pane h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#focus-pod-pane ul {
+    list-style: none;
+    padding: 0;
+}
+
+        #focus-pod-pane ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #focus-pod-pane ul li:hover {
+            background-color: rgba(127, 129, 245, 0.1);
+            padding-left: 10px;
+        }
+
+        .city-locations {
+            display: none;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .city-locations.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .location-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #7F81F5;
+        }
+
+        .location-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .location-address {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .location-details {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .booking-btn {
+            background: #7F81F5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .booking-btn:hover {
+            background: #6B6DE8;
+            transform: translateY(-2px);
+        }
+
+        .booking-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .booking-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .booking-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-btn {
+            background: #7F81F5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #6B6DE8;
+        }
+
+        .success-message {
+            background: #28A745;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Contact Section Styles */
+        .contact-section {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .contact-section h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-info h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            min-width: 30px;
+        }
+
+        .contact-details strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-details p {
+            color: var(--secondary);
+            margin: 0.2rem 0;
+            font-size: 0.95rem;
+        }
+
+        .contact-form-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-form-container h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .contact-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .contact-form label {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .contact-form input,
+        .contact-form select,
+        .contact-form textarea {
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form input:focus,
+        .contact-form select:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--light);
+        }
+
+        .contact-submit-btn {
+            background: linear-gradient(135deg, var(--light), #9A9BF8);
+            color: var(--primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .contact-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(127, 129, 245, 0.3);
+        }
+
+        .contact-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Emergency Section */
+        .emergency-section {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .emergency-section h3 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .emergency-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .emergency-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .emergency-card:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .emergency-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .emergency-number {
+            color: #FF6B6B;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .emergency-card p:last-child {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Success Message */
+        .contact-success {
+            background: linear-gradient(135deg, #28A745, #20C997);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 1rem;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design for Contact */
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .emergency-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+#close-focus-pods {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+        /* Lighter Color Scheme */
+        :root {
+            --primary: #FFFFFF;
+            /* White */
+            --secondary: #E6E7FF;
+            /* Very light lavender */
+            --accent: #FF7E5D;
+            /* Keeping accent color */
+            --light: #7F81F5;
+            /* Lighter purple (#5D5FEF → #7F81F5) */
+            --dark: #F8F9FA;
+            /* Light gray (almost white) */
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            /* Lighter purple background */
+        }
+
+        /* Layout */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header - Now white text on lighter purple */
+        header {
+            background: linear-gradient(135deg, var(--light), #9A9BF8);
+            /* Lighter purple gradient */
+            color: var(--primary);
+            /* White text */
+            padding: 1.5rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: slideDown 0.8s 0.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation - Now with dropdown menus */
+        nav {
+            background-color: var(--light);
+            /* Lighter purple */
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: fadeIn 0.6s 0.4s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+            transform: scale(0.95);
+            opacity: 0;
+            animation: popIn 0.4s forwards;
+            position: relative;
+            /* For dropdown positioning */
+        }
+
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Stagger the nav items */
+        nav ul li:nth-child(1) {
+            animation-delay: 0.6s;
+        }
+
+        nav ul li:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        nav ul li:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        nav ul li:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+
+        nav a {
+            color: var(--primary);
+            /* White text */
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+            display: inline-block;
+        }
+
+        nav a:hover {
+            color: var(--secondary);
+            /* Very light lavender */
+        }
+
+        nav a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary);
+            /* Very light lavender */
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover:after {
+            width: 100%;
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 1;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 100%;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform-origin: top center;
+        }
+
+        nav ul li:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(5px);
+        }
+
+        .dropdown-content a {
+            color: var(--light);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            transition: all 0.3s;
+            border-bottom: 1px solid rgba(230, 231, 255, 0.3);
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--secondary);
+            color: var(--light);
+            padding-left: 20px;
+        }
+
+        /* User menu styles */
+        .user-menu {
+            margin-left: auto;
+        }
+
+        .user-menu .dropdown-content {
+            right: 0;
+            left: auto;
+        }
+
+        #user-name {
+            font-weight: 600;
+        }
+
+        /* Authentication check overlay */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .auth-message {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-message h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .auth-message p {
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .auth-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(127, 129, 245, 0.4);
+        }
+
+        /* Main Content */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s 1s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            /* White */
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: var(--secondary);
+            /* Very light lavender */
+        }
+
+        .welcome-message {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .welcome-message p {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Therapy Chat Interface - Now white on lighter purple */
+        .therapy-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.15);
+            /* Semi-transparent white */
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transform: scale(0.98);
+            opacity: 0;
+            animation: scaleIn 0.6s 1.2s forwards;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        @keyframes scaleIn {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+            color: var(--primary);
+            /* White */
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 18px;
+            line-height: 1.4;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: messageIn 0.4s forwards;
+        }
+
+        @keyframes messageIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--secondary);
+            /* Very light lavender */
+            color: var(--light);
+            /* Lighter purple text */
+            border-bottom-right-radius: 5px;
+            animation-delay: 1.6s;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: rgba(255, 255, 255, 0.95);
+            /* White */
+            color: var(--light);
+            /* Lighter purple text */
+            border-bottom-left-radius: 5px;
+            animation-delay: 1.8s;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--primary);
+            /* White */
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary);
+            /* White */
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .chat-input button {
+            background-color: var(--primary);
+            /* White */
+            color: var(--light);
+            /* Lighter purple */
+            border: none;
+            border-radius: 25px;
+            padding: 0 1.5rem;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform: scale(1);
+            font-weight: 600;
+        }
+
+        .chat-input button:hover {
+            background-color: var(--secondary);
+            /* Very light lavender */
+            transform: scale(1.05);
+        }
+
+        .chat-input button:active {
+            transform: scale(0.98);
+        }
+
+        /* Enhanced Mood Tracker - Comprehensive tracking system */
+        .mood-tracker {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6e7ff 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(127, 129, 245, 0.1);
+            border: 1px solid rgba(127, 129, 245, 0.1);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: fadeIn 0.6s 1.4s forwards;
+        }
+
+        .mood-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .mood-header h2 {
+            color: #7F81F5;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .mood-header p {
+            color: #666;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .mood-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(127, 129, 245, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        .mood-section h3 {
+            color: #7F81F5;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mood-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mood-option {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(127, 129, 245, 0.2);
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.6);
+            min-width: 90px;
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .mood-option:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(127, 129, 245, 0.2);
+            border-color: rgba(127, 129, 245, 0.4);
+        }
+
+        .mood-option.selected {
+            background: linear-gradient(135deg, #7F81F5, #9B9DFF);
+            border-color: #7F81F5;
+            color: white;
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(127, 129, 245, 0.3);
+        }
+
+        .mood-option.selected .mood-label {
+            color: white;
+        }
+
+        .mood-emoji {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .mood-option:hover .mood-emoji {
+            transform: scale(1.2);
+        }
+
+        .mood-label {
+            color: #7F81F5;
+            font-weight: 600;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        /* Mood Details Section */
+        .mood-details-grid {
+            display: grid;
+            gap: 25px;
+        }
+
+        .detail-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .detail-group label {
+            color: #7F81F5;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background-color: rgba(127, 129, 245, 0.1);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #7F81F5;
+        }
+
+        .energy-slider {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .energy-slider input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #ff6b6b, #ffd93d, #6bcf7f);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .energy-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #7F81F5;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(127, 129, 245, 0.3);
+        }
+
+        .energy-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        #mood-notes {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid rgba(127, 129, 245, 0.2);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        #mood-notes:focus {
+            outline: none;
+            border-color: #7F81F5;
+        }
+
+        .save-mood-btn {
+            background: linear-gradient(135deg, #7F81F5, #9B9DFF);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 16px rgba(127, 129, 245, 0.3);
+        }
+
+        .save-mood-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(127, 129, 245, 0.4);
+        }
+
+        /* Mood History Section */
+        .mood-history-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(127, 129, 245, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #7F81F5;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(127, 129, 245, 0.1);
+            color: #7F81F5;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Mood Chart */
+        .mood-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            height: 200px;
+            gap: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-fill {
+            width: 100%;
+            background: linear-gradient(to top, #7F81F5, #9B9DFF);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chart-bar:hover .bar-fill {
+            transform: scaleY(1.1);
+            box-shadow: 0 4px 16px rgba(127, 129, 245, 0.3);
+        }
+
+        .bar-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #7F81F5;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.high {
+            background: linear-gradient(135deg, #6bcf7f, #4caf50);
+        }
+
+        .legend-color.medium {
+            background: linear-gradient(135deg, #ffd93d, #ff9800);
+        }
+
+        .legend-color.low {
+            background: linear-gradient(135deg, #ff6b6b, #f44336);
+        }
+
+        /* Trends Insights */
+        .trends-insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(127, 129, 245, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .insight-card h4 {
+            color: #7F81F5;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .insight-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .insight-desc {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Mood Insights Section */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(127, 129, 245, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .insight-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .insight-emoji {
+            font-size: 1.5em;
+        }
+
+        .insight-header h4 {
+            color: #7F81F5;
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .insight-item p {
+            color: #666;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Mood Goals Section */
+        .goals-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .goal-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(127, 129, 245, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .goal-icon {
+            font-size: 1.5em;
+        }
+
+        .goal-header h4 {
+            color: #7F81F5;
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .goal-progress {
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(127, 129, 245, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #7F81F5, #9B9DFF);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .goal-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Mood Success Message */
+        .mood-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #6bcf7f, #4caf50);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(107, 207, 127, 0.3);
+            z-index: 1000;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .success-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .success-emoji {
+            font-size: 2em;
+        }
+
+        .success-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+        }
+
+        .success-content p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Calendar Styles */
+        .mood-calendar {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(127, 129, 245, 0.1);
+        }
+
+        .calendar-header h4 {
+            color: #7F81F5;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #7F81F5;
+            padding: 10px 5px;
+            font-size: 0.9em;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(127, 129, 245, 0.1);
+        }
+
+        .calendar-day:hover {
+            background: rgba(127, 129, 245, 0.1);
+            transform: scale(1.1);
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            transform: none;
+        }
+
+        .calendar-day.has-mood {
+            background: linear-gradient(135deg, #7F81F5, #9B9DFF);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.has-mood:hover {
+            background: linear-gradient(135deg, #6B6DD8, #8A8CE8);
+        }
+
+        /* Animation for success message */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive adjustments for mood tracking */
+        @media (max-width: 768px) {
+            .mood-options {
+                gap: 10px;
+            }
+
+            .mood-option {
+                min-width: 70px;
+                padding: 15px 10px;
+            }
+
+            .mood-emoji {
+                font-size: 1.8em;
+            }
+
+            .mood-label {
+                font-size: 0.8em;
+            }
+
+            .checkbox-group {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .trends-insights {
+                grid-template-columns: 1fr;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goals-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-bars {
+                height: 150px;
+            }
+
+            .mood-history-tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                flex: 1;
+                min-width: 80px;
+            }
+        }
+
+        /* Resources Section - Now with lighter purple/white scheme */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .resource-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            /* Semi-transparent white */
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(20px);
+            opacity: 0;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: var(--primary);
+            /* White */
+        }
+
+        /* Animate resource cards when scrolled into view */
+        .resource-card.in-view {
+            animation: fadeInUp 0.6s forwards;
+        }
+
+        .resource-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .resource-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .resource-card:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .resource-card h3 {
+            color: var(--primary);
+            /* White */
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-card p {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            /* Very light lavender */
+        }
+
+        .resource-link {
+            display: inline-block;
+            color: var(--accent);
+            /* Keeping orange accent */
+            font-weight: 500;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .resource-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .resource-link:hover:after {
+            width: 100%;
+        }
+
+        /* Footer - Now lighter purple with white text */
+        footer {
+            background-color: var(--light);
+            /* Lighter purple */
+            color: var(--primary);
+            /* White */
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+            opacity: 0;
+            animation: fadeIn 0.8s 2s forwards;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            /* White */
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+            /* Very light lavender */
+        }
+
+        .footer-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover:after {
+            width: 100%;
+        }
+
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Floating animation for the AI chat header */
+        .chat-header h2 {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Pulsing animation for the send button */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .chat-input button.pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Breathing animation for the AI message */
+        .ai-message {
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .mood-options {
+                gap: 0.5rem;
+            }
+
+            .mood-option {
+                padding: 0.5rem;
+                flex: 0 0 calc(33% - 1rem);
+            }
+
+            /* Adjust dropdown for mobile */
+            .dropdown-content {
+                min-width: 160px;
+                left: 0;
+                transform: none;
+            }
+
+            nav ul li:hover .dropdown-content {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul li {
+                margin: 0 8px;
+            }
+
+            .chat-input {
+                flex-direction: column;
+            }
+
+            .chat-input button {
+                margin-left: 0;
+                margin-top: 0.5rem;
+                padding: 0.8rem;
+            }
+
+            .mood-option {
+                flex: 0 0 calc(50% - 1rem);
+            }
+
+            /* Stack nav items vertically on very small screens */
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 5px 0;
+            }
+
+            .dropdown-content {
+                position: static;
+                display: none;
+                width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            nav ul li:hover .dropdown-content {
+                display: block;
+                position: static;
+                transform: none;
+            }
+        }
+
+        .contact-cards-wrapper {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .contact-card {
+            background: rgba(255,255,255,0.18);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(127,129,245,0.08);
+            padding: 2rem 1.5rem;
+            flex: 1 1 340px;
+            min-width: 320px;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .contact-info h3, .contact-form-container h3 {
+            margin-bottom: 1rem;
+            color: var(--light);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0 0 0.7rem 0;
+            font-size: 1rem;
+        }
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.98rem;
+        }
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+        .contact-form .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        .contact-form .form-group {
+            flex: 1;
+        }
+        .contact-form input, .contact-form select, .contact-form textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .newsletter-group {
+            margin-top: -0.5rem;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, var(--light), #9A9BF8, var(--light));
+            margin: 2rem 0 2.5rem 0;
+            border-radius: 2px;
+        }
+        @media (max-width: 900px) {
+            .contact-cards-wrapper {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .contact-card {
+                max-width: 100%;
+            }
+        }
+
+        .detox-challenge-card {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(90deg, #e6e7ff 80%, #fff 100%);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(127,129,245,0.08);
+            padding: 18px 18px 18px 12px;
+            margin-bottom: 10px;
+            gap: 18px;
+            animation: fadeInUp 0.7s;
+        }
+        .challenge-icon {
+            font-size: 2.5rem;
+            margin-right: 10px;
+        }
+        .challenge-content {
+            flex: 1;
+        }
+        .challenge-title {
+            font-weight: 700;
+            color: #7F81F5;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+        .challenge-desc {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .challenge-btn {
+            background: #7F81F5;
+            color: white;
+            border: none;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.98rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .challenge-btn:hover {
+            background: #5D5FEF;
+            transform: translateY(-2px) scale(1.04);
+        }
+        .detox-activity-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        .detox-activity-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(127,129,245,0.08);
+            padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+            transition: box-shadow 0.2s, transform 0.2s;
+            border-left: 4px solid #7F81F5;
+            animation: fadeInUp 0.7s;
+        }
+        .detox-activity-card:hover {
+            box-shadow: 0 8px 24px rgba(127,129,245,0.18);
+            transform: translateY(-3px) scale(1.03);
+        }
+        .detox-activity-icon {
+            font-size: 2rem;
+            margin-bottom: 2px;
+        }
+        .detox-activity-title {
+            font-weight: 600;
+            color: #7F81F5;
+            font-size: 1.08rem;
+        }
+        .detox-activity-desc {
+            color: #333;
+            font-size: 0.98rem;
+            margin-bottom: 6px;
+        }
+        .detox-activity-btn {
+            background: #E6E7FF;
+            color: #7F81F5;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .detox-activity-btn:hover {
+            background: #7F81F5;
+            color: white;
+            transform: translateY(-2px) scale(1.04);
+        }
+        .detox-quote {
+            font-style: italic;
+            color: #7F81F5;
+            text-align: center;
+            font-size: 1.05rem;
+            margin: 18px 0 10px 0;
+        }
+        .detox-fun-fact {
+            font-size: 0.98rem;
+            color: #5D5FEF;
+            text-align: center;
+            background: rgba(127,129,245,0.07);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 10px 0 0 0;
+        }
+        @media (max-width: 900px) {
+            .detox-activity-grid {
+                grid-template-columns: 1fr;
+            }
+            .detox-challenge-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        /* Mission Modal Styles */
+        .mission-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .mission-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .mission-content {
+            background: linear-gradient(135deg, #f9f9ff 0%, #e6e7ff 100%);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(127, 129, 245, 0.3);
+            position: relative;
+            animation: slideInUp 0.4s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mission-header {
+            background: linear-gradient(135deg, #7F81F5 0%, #5D5FEF 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .mission-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mission-close:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .mission-header h2 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .mission-header p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .mission-body {
+            padding: 2.5rem;
+        }
+
+        .mission-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(127, 129, 245, 0.1);
+            border-left: 5px solid #7F81F5;
+        }
+
+        .mission-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .mission-section h3 {
+            color: #7F81F5;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mission-section p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .mission-section ul {
+            color: #333;
+            line-height: 1.6;
+            padding-left: 1.5rem;
+        }
+
+        .mission-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .mission-values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .value-item {
+            background: linear-gradient(135deg, #e6e7ff 0%, #f0f1ff 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .value-item:hover {
+            border-color: #7F81F5;
+            transform: translateY(-2px);
+        }
+
+        .value-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .value-title {
+            font-weight: 600;
+            color: #7F81F5;
+            margin-bottom: 0.5rem;
+        }
+
+        .value-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .mission-content {
+                width: 95%;
+                margin: 2% auto;
+                max-height: 90vh;
+            }
+            
+            .mission-header {
+                padding: 1.5rem;
+            }
+            
+            .mission-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .mission-body {
+                padding: 1.5rem;
+            }
+            
+            .mission-values {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">MindEase</div>
+            <div class="tagline">Your AI-Powered Mental Wellness Companion</div>
+        </div>
+    </header>
+
+    <nav>
+        
+        <div class="container">
+            <ul>
+                <li><a href="#" id="toggle-focus-pods">📍 Focus Pods</a></li>
+                <li>
+                    <a href="#therapy">Therapy Chat</a>
+                </li>
+                <li>
+                    <a href="#mood">Mood Tracking</a>
+                </li>
+                <li>
+                    <a href="#resources">Resources ▼</a>
+                    <div class="dropdown-content">
+                        <a href="#">Self-Help Tools</a>
+                        <a href="#">Crisis Hotlines</a>
+                        <a href="#">Therapist Directory</a>
+                        <a href="#">Mental Health Articles</a>
+                        <a href="#">Support Groups</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#about">About ▼</a>
+                    <div class="dropdown-content">
+                        <a href="#" id="dropdown-mission">Our Mission</a>
+                        <a href="#" id="dropdown-how-it-works">How It Works</a>
+                        <a href="#" id="dropdown-privacy">Privacy Policy</a>
+                        <a href="#" id="dropdown-team">Team</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#contact">Contact ▼</a>
+                    <div class="dropdown-content">
+                        <a href="#" id="dropdown-contact">Get in Touch</a>
+                        <a href="#" id="dropdown-feedback">Feedback/Support</a>
+                        <a href="#" id="dropdown-bug">Report a Bug</a>
+                        <a href="#" id="dropdown-partner">Partner with Us</a>
+                        <a href="#" id="dropdown-press">Press Inquiries</a>
+                        <a href="#" id="dropdown-careers">Careers</a>
+                    </div>
+                </li>
+                <li class="user-menu">
+                    <a href="#" id="user-menu-toggle">👤 <span id="user-name">Guest</span> ▼</a>
+                    <div class="dropdown-content">
+                        <a href="#" id="user-profile">Profile</a>
+                        <a href="#" id="user-settings">Settings</a>
+                        <a href="#" id="logout-btn">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="focus-pod-pane">
+        <button id="close-focus-pods">✖</button>
+        <h2>🌆 Focus Pods for Cities</h2>
+        
+        <ul>
+            <li data-city="delhi">🌆 Delhi</li>
+            <li data-city="mumbai">🌆 Mumbai</li>
+            <li data-city="bangalore">🌆 Bangalore</li>
+            <li data-city="kolkata">🌆 Kolkata</li>
+            <li data-city="chennai">🌆 Chennai</li>
+            <li data-city="hyderabad">🌆 Hyderabad</li>
+        </ul>
+
+        <!-- Delhi Locations -->
+        <div class="city-locations" id="delhi-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 Connaught Place Center</div>
+                <div class="location-address">📍 15, Connaught Place, New Delhi - 110001</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹1500/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="Connaught Place Center" data-city="Delhi">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 South Extension Center</div>
+                <div class="location-address">📍 45, South Extension Part-1, New Delhi - 110049</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1800/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="South Extension Center" data-city="Delhi">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Dwarka Center</div>
+                <div class="location-address">📍 Sector 12, Dwarka, New Delhi - 110078</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-6PM | 💰 ₹1200/session | 🧘 4 Pods Available</div>
+                <button class="booking-btn" data-location="Dwarka Center" data-city="Delhi">Book Session</button>
+            </div>
+        </div>
+
+        <!-- Mumbai Locations -->
+        <div class="city-locations" id="mumbai-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 Bandra West Center</div>
+                <div class="location-address">📍 23, Linking Road, Bandra West, Mumbai - 400050</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹2000/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="Bandra West Center" data-city="Mumbai">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Andheri Center</div>
+                <div class="location-address">📍 67, Andheri Kurla Road, Andheri East, Mumbai - 400059</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1600/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="Andheri Center" data-city="Mumbai">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Powai Center</div>
+                <div class="location-address">📍 Hiranandani Gardens, Powai, Mumbai - 400076</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-6PM | 💰 ₹1800/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="Powai Center" data-city="Mumbai">Book Session</button>
+            </div>
+        </div>
+
+        <!-- Bangalore Locations -->
+        <div class="city-locations" id="bangalore-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 Koramangala Center</div>
+                <div class="location-address">📍 8th Block, Koramangala, Bangalore - 560034</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹1700/session | 🧘 4 Pods Available</div>
+                <button class="booking-btn" data-location="Koramangala Center" data-city="Bangalore">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Indiranagar Center</div>
+                <div class="location-address">📍 100 Feet Road, Indiranagar, Bangalore - 560038</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1900/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="Indiranagar Center" data-city="Bangalore">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Whitefield Center</div>
+                <div class="location-address">📍 ITPL Road, Whitefield, Bangalore - 560066</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-6PM | 💰 ₹1500/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="Whitefield Center" data-city="Bangalore">Book Session</button>
+            </div>
+        </div>
+
+        <!-- Kolkata Locations -->
+        <div class="city-locations" id="kolkata-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 Park Street Center</div>
+                <div class="location-address">📍 12, Park Street, Kolkata - 700016</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹1400/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="Park Street Center" data-city="Kolkata">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Salt Lake Center</div>
+                <div class="location-address">📍 Sector 5, Salt Lake City, Kolkata - 700091</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1300/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="Salt Lake Center" data-city="Kolkata">Book Session</button>
+            </div>
+        </div>
+
+        <!-- Chennai Locations -->
+        <div class="city-locations" id="chennai-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 T Nagar Center</div>
+                <div class="location-address">📍 45, Usman Road, T Nagar, Chennai - 600017</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹1600/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="T Nagar Center" data-city="Chennai">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Adyar Center</div>
+                <div class="location-address">📍 78, LB Road, Adyar, Chennai - 600020</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1800/session | 🧘 2 Pods Available</div>
+                <button class="booking-btn" data-location="Adyar Center" data-city="Chennai">Book Session</button>
+            </div>
+        </div>
+
+        <!-- Hyderabad Locations -->
+        <div class="city-locations" id="hyderabad-locations">
+            <div class="location-item">
+                <div class="location-name">🏢 Banjara Hills Center</div>
+                <div class="location-address">📍 Road No. 12, Banjara Hills, Hyderabad - 500034</div>
+                <div class="location-details">⏰ Mon-Sat: 9AM-8PM | 💰 ₹1700/session | 🧘 3 Pods Available</div>
+                <button class="booking-btn" data-location="Banjara Hills Center" data-city="Hyderabad">Book Session</button>
+            </div>
+            <div class="location-item">
+                <div class="location-name">🏢 Hitech City Center</div>
+                <div class="location-address">📍 Madhapur, Hitech City, Hyderabad - 500081</div>
+                <div class="location-details">⏰ Mon-Sat: 10AM-7PM | 💰 ₹1600/session | 🧘 4 Pods Available</div>
+                <button class="booking-btn" data-location="Hitech City Center" data-city="Hyderabad">Book Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="booking-modal" id="booking-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">×</button>
+            <h2>📅 Book Your Focus Pod Session</h2>
+            <form class="booking-form" id="booking-form">
+                <div class="form-group">
+                    <label for="location-name">Location:</label>
+                    <input type="text" id="location-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="customer-name">Full Name:</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number:</label>
+                    <input type="tel" id="customer-phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email:</label>
+                    <input type="email" id="customer-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="session-date">Preferred Date:</label>
+                    <input type="date" id="session-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="session-time">Preferred Time:</label>
+                    <select id="session-time" required>
+                        <option value="">Select a time</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="session-type">Session Type:</label>
+                    <select id="session-type" required>
+                        <option value="">Select session type</option>
+                        <option value="anxiety">Anxiety Management</option>
+                        <option value="stress">Stress Relief</option>
+                        <option value="depression">Depression Support</option>
+                        <option value="general">General Wellness</option>
+                        <option value="crisis">Crisis Support</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="special-requests">Special Requests (Optional):</label>
+                    <textarea id="special-requests" placeholder="Any specific needs or preferences..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">📅 Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+
+    <main class="container">
+
+        <section class="hero">
+            <h1>Compassionate AI Therapy Whenever You Need It</h1>
+            <p>MindEase provides 24/7 emotional support through advanced artificial intelligence, helping you navigate
+                life's challenges with personalized care.</p>
+            <div class="welcome-message" id="welcome-message" style="display: none;">
+                <p>Welcome back, <span id="welcome-user-name"></span>! 👋</p>
+            </div>
+        </section>
+
+        <section id="therapy">
+            <div class="therapy-container">
+                <div class="chat-header">
+                    <h2>Talk with Your AI Companion</h2>
+                </div>
+                <div class="chat-messages">
+                    <div class="message ai-message">
+                        Hello! I'm here to listen and help. How are you feeling today?
+                    </div>
+                    <div class="message user-message">
+                        I've been feeling a bit anxious lately.
+                    </div>
+                    <div class="message ai-message">
+                        I'm sorry to hear you're feeling anxious. Would you like to talk about what's been on your mind?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Type your message here..." id="user-input">
+                    <button id="send-btn" class="pulse">Send</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="mood" class="mood-tracker">
+            <div class="mood-header">
+                <h2>📊 Mood Tracking & Insights</h2>
+                <p>Track your daily emotions and discover patterns in your mental well-being</p>
+            </div>
+
+            <!-- Current Mood Section -->
+            <div class="mood-section current-mood">
+                <h3>😊 How are you feeling today?</h3>
+                <div class="mood-options">
+                    <div class="mood-option" data-mood="ecstatic" data-value="10">
+                        <div class="mood-emoji">🤩</div>
+                        <div class="mood-label">Ecstatic</div>
+                    </div>
+                    <div class="mood-option" data-mood="happy" data-value="8">
+                        <div class="mood-emoji">😊</div>
+                        <div class="mood-label">Happy</div>
+                    </div>
+                    <div class="mood-option" data-mood="content" data-value="6">
+                        <div class="mood-emoji">😌</div>
+                        <div class="mood-label">Content</div>
+                    </div>
+                    <div class="mood-option" data-mood="neutral" data-value="5">
+                        <div class="mood-emoji">😐</div>
+                        <div class="mood-label">Neutral</div>
+                    </div>
+                    <div class="mood-option" data-mood="tired" data-value="4">
+                        <div class="mood-emoji">😴</div>
+                        <div class="mood-label">Tired</div>
+                    </div>
+                    <div class="mood-option" data-mood="sad" data-value="3">
+                        <div class="mood-emoji">😔</div>
+                        <div class="mood-label">Sad</div>
+                    </div>
+                    <div class="mood-option" data-mood="anxious" data-value="2">
+                        <div class="mood-emoji">😟</div>
+                        <div class="mood-label">Anxious</div>
+                    </div>
+                    <div class="mood-option" data-mood="angry" data-value="1">
+                        <div class="mood-emoji">😡</div>
+                        <div class="mood-label">Angry</div>
+                    </div>
+                    <div class="mood-option" data-mood="depressed" data-value="0">
+                        <div class="mood-emoji">😢</div>
+                        <div class="mood-label">Depressed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Details Section -->
+            <div class="mood-section mood-details" id="mood-details" style="display: none;">
+                <h3>📝 Tell us more about your day</h3>
+                <div class="mood-details-grid">
+                    <div class="detail-group">
+                        <label>What influenced your mood today?</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="work">
+                                <span>Work/Studies</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="relationships">
+                                <span>Relationships</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="health">
+                                <span>Health</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="sleep">
+                                <span>Sleep</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="exercise">
+                                <span>Exercise</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="social">
+                                <span>Social Activities</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="stress">
+                                <span>Stress</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="other">
+                                <span>Other</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="detail-group">
+                        <label>How would you rate your energy level?</label>
+                        <div class="energy-slider">
+                            <input type="range" id="energy-level" min="1" max="10" value="5">
+                            <div class="energy-labels">
+                                <span>Exhausted</span>
+                                <span>Energized</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-group">
+                        <label>Additional notes (optional)</label>
+                        <textarea id="mood-notes" placeholder="Share what's on your mind..."></textarea>
+                    </div>
+                </div>
+                <button class="save-mood-btn" id="save-mood-btn">💾 Save Mood Entry</button>
+            </div>
+
+            <!-- Mood History Section -->
+            <div class="mood-section mood-history">
+                <h3>📈 Your Mood Journey</h3>
+                <div class="mood-history-tabs">
+                    <button class="tab-btn active" data-tab="weekly">This Week</button>
+                    <button class="tab-btn" data-tab="monthly">This Month</button>
+                    <button class="tab-btn" data-tab="trends">Trends</button>
+                </div>
+                
+                <div class="tab-content active" id="weekly-tab">
+                    <div class="mood-chart">
+                        <div class="chart-bars">
+                            <div class="chart-bar" data-day="Mon" data-mood="8">
+                                <div class="bar-fill" style="height: 80%"></div>
+                                <span class="bar-label">Mon</span>
+                            </div>
+                            <div class="chart-bar" data-day="Tue" data-mood="6">
+                                <div class="bar-fill" style="height: 60%"></div>
+                                <span class="bar-label">Tue</span>
+                            </div>
+                            <div class="chart-bar" data-day="Wed" data-mood="7">
+                                <div class="bar-fill" style="height: 70%"></div>
+                                <span class="bar-label">Wed</span>
+                            </div>
+                            <div class="chart-bar" data-day="Thu" data-mood="5">
+                                <div class="bar-fill" style="height: 50%"></div>
+                                <span class="bar-label">Thu</span>
+                            </div>
+                            <div class="chart-bar" data-day="Fri" data-mood="9">
+                                <div class="bar-fill" style="height: 90%"></div>
+                                <span class="bar-label">Fri</span>
+                            </div>
+                            <div class="chart-bar" data-day="Sat" data-mood="8">
+                                <div class="bar-fill" style="height: 80%"></div>
+                                <span class="bar-label">Sat</span>
+                            </div>
+                            <div class="chart-bar" data-day="Sun" data-mood="7">
+                                <div class="bar-fill" style="height: 70%"></div>
+                                <span class="bar-label">Sun</span>
+                            </div>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color high"></span>
+                                <span>High (8-10)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color medium"></span>
+                                <span>Medium (5-7)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color low"></span>
+                                <span>Low (0-4)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="monthly-tab">
+                    <div class="mood-calendar">
+                        <div class="calendar-header">
+                            <h4>December 2024</h4>
+                        </div>
+                        <div class="calendar-grid">
+                            <!-- Calendar days will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="trends-tab">
+                    <div class="trends-insights">
+                        <div class="insight-card">
+                            <div class="insight-icon">📊</div>
+                            <h4>Weekly Average</h4>
+                            <p class="insight-value">7.2/10</p>
+                            <p class="insight-desc">Your mood has improved by 0.8 points this week</p>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">🌅</div>
+                            <h4>Best Day</h4>
+                            <p class="insight-value">Friday</p>
+                            <p class="insight-desc">You consistently feel better on Fridays</p>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">🌧️</div>
+                            <h4>Common Triggers</h4>
+                            <p class="insight-value">Work Stress</p>
+                            <p class="insight-desc">Work-related stress affects your mood most</p>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">💡</div>
+                            <h4>Recommendation</h4>
+                            <p class="insight-value">Try Meditation</p>
+                            <p class="insight-desc">Meditation on stressful days could help</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Insights Section -->
+            <div class="mood-section mood-insights">
+                <h3>🧠 Mood Insights & Tips</h3>
+                <div class="insights-grid">
+                    <div class="insight-item">
+                        <div class="insight-header">
+                            <span class="insight-emoji">🎯</span>
+                            <h4>Pattern Recognition</h4>
+                        </div>
+                        <p>You tend to feel better on weekends and after exercise. Consider scheduling more physical activities during weekdays.</p>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-header">
+                            <span class="insight-emoji">🌱</span>
+                            <h4>Growth Areas</h4>
+                        </div>
+                        <p>Your mood improves significantly when you get 7+ hours of sleep. Try establishing a consistent bedtime routine.</p>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-header">
+                            <span class="insight-emoji">⚡</span>
+                            <h4>Quick Wins</h4>
+                        </div>
+                        <p>Taking short breaks every 2 hours at work has shown to improve your afternoon mood by 2 points.</p>
+                    </div>
+                    <div class="insight-item">
+                        <div class="insight-header">
+                            <span class="insight-emoji">🎨</span>
+                            <h4>Creative Expression</h4>
+                        </div>
+                        <p>On days when you engage in creative activities, your mood score increases by an average of 1.5 points.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Goals Section -->
+            <div class="mood-section mood-goals">
+                <h3>🎯 Mood Goals & Achievements</h3>
+                <div class="goals-container">
+                    <div class="goal-card">
+                        <div class="goal-header">
+                            <span class="goal-icon">🔥</span>
+                            <h4>7-Day Streak</h4>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="progress-text">6/7 days completed</span>
+                        </div>
+                        <p>Track your mood for 7 consecutive days</p>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-header">
+                            <span class="goal-icon">📈</span>
+                            <h4>Mood Improvement</h4>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <span class="progress-text">3/5 days above 7</span>
+                        </div>
+                        <p>Maintain a mood score above 7 for 5 days</p>
+                    </div>
+                    <div class="goal-card">
+                        <div class="goal-header">
+                            <span class="goal-icon">🧘</span>
+                            <h4>Mindfulness Practice</h4>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 40%"></div>
+                            </div>
+                            <span class="progress-text">2/5 sessions</span>
+                        </div>
+                        <p>Complete 5 mindfulness sessions this week</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Professional Help</a>
+                <a href="#">Research</a>
+            </div>
+            <p class="copyright">© 2023 MindEase AI Therapy Companion. This is not a substitute for professional medical
+                advice.</p>
+            <p class="copyright">If you're in crisis, please contact emergency services or a crisis hotline.</p>
+        </div>
+    </footer>
+
+
+
+    <script src="script.js"></script>
+        <script>
+        // Check if user is logged in, if not redirect to login
+        (function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!currentUser) {
+                // Instead of redirecting, show the auth overlay
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('auth-overlay').style.display = 'flex';
+                });
+            }
+        })();
+
+        // User Management System
+        class UserManager {
+            constructor() {
+                this.users = JSON.parse(localStorage.getItem('users') || '[]');
+                this.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            }
+
+            getCurrentUser() {
+                return this.currentUser;
+            }
+
+            updateMoodHistory(moodEntry) {
+                if (!this.currentUser) return;
+
+                if (!this.currentUser.moodHistory) {
+                    this.currentUser.moodHistory = [];
+                }
+
+                this.currentUser.moodHistory.push(moodEntry);
+                
+                // Update in localStorage
+                if (this.currentUser.isGuest) {
+                    localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                } else {
+                    const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        this.users[userIndex] = this.currentUser;
+                        localStorage.setItem('users', JSON.stringify(this.users));
+                    }
+                }
+            }
+
+            getMoodHistory() {
+                return this.currentUser ? this.currentUser.moodHistory || [] : [];
+            }
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        const userManager = new UserManager();
+
+        // Check authentication on page load
+        function checkAuthentication() {
+            const currentUser = userManager.getCurrentUser();
+            if (!currentUser) {
+                document.getElementById('auth-overlay').style.display = 'flex';
+                return false;
+            }
+            
+            // Update user name in navigation
+            const userNameElement = document.getElementById('user-name');
+            if (userNameElement) {
+                userNameElement.textContent = currentUser.name || 'Guest';
+            }
+            
+            // Show welcome message
+            const welcomeMessage = document.getElementById('welcome-message');
+            const welcomeUserName = document.getElementById('welcome-user-name');
+            if (welcomeMessage && welcomeUserName) {
+                welcomeUserName.textContent = currentUser.name || 'Guest';
+                welcomeMessage.style.display = 'block';
+            }
+            
+            return true;
+        }
+
+        // Enhanced Mood Tracker Functionality
+        let selectedMood = null;
+        let selectedMoodValue = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return;
+            }
+            console.log('DOM Content Loaded - Initializing mood tracker');
+            
+            const moodOptions = document.querySelectorAll('.mood-option');
+            const moodDetails = document.getElementById('mood-details');
+            const saveMoodBtn = document.getElementById('save-mood-btn');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            console.log('Mood tracker initialized');
+            console.log('Mood options found:', moodOptions.length);
+            console.log('Mood details element:', moodDetails);
+            console.log('Save button found:', saveMoodBtn);
+            
+            // Test if elements exist
+            if (moodOptions.length === 0) {
+                console.error('No mood options found!');
+                return;
+            }
+            
+            if (!moodDetails) {
+                console.error('Mood details element not found!');
+                return;
+            }
+            
+            if (!saveMoodBtn) {
+                console.error('Save mood button not found!');
+                return;
+            }
+
+            // Mood selection functionality
+            moodOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    console.log('Mood option clicked:', this.getAttribute('data-mood'));
+                    
+                    // Remove selected class from all options
+                    moodOptions.forEach(opt => opt.classList.remove('selected'));
+
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+
+                    // Store selected mood data
+                    selectedMood = this.getAttribute('data-mood');
+                    selectedMoodValue = this.getAttribute('data-value');
+
+                    // Show mood details section
+                    if (moodDetails) {
+                        moodDetails.style.display = 'block';
+                        moodDetails.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+
+                    // Add bounce effect
+                    this.style.animation = 'none';
+                    void this.offsetWidth;
+                    this.style.animation = 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.6)';
+
+                    console.log(`Mood selected: ${selectedMood} (Value: ${selectedMoodValue})`);
+                });
+            });
+
+            // Save mood functionality
+            if (saveMoodBtn) {
+                saveMoodBtn.addEventListener('click', function() {
+                    console.log('Save button clicked');
+                    if (!selectedMood) {
+                        alert('Please select a mood first!');
+                        return;
+                    }
+
+                    // Collect mood details
+                    const influences = Array.from(document.querySelectorAll('.checkbox-item input:checked')).map(cb => cb.value);
+                    const energyLevel = document.getElementById('energy-level').value;
+                    const notes = document.getElementById('mood-notes').value;
+
+                    // Create mood entry object
+                    const moodEntry = {
+                        mood: selectedMood,
+                        value: selectedMoodValue,
+                        influences: influences,
+                        energyLevel: energyLevel,
+                        notes: notes,
+                        timestamp: new Date().toISOString(),
+                        date: new Date().toLocaleDateString()
+                    };
+
+                    console.log('Saving mood entry:', moodEntry);
+
+                    // Save to user's mood history
+                    saveMoodEntry(moodEntry);
+
+                    // Show success message
+                    showMoodSuccess(moodEntry);
+
+                    // Reset form
+                    resetMoodForm();
+                });
+            }
+
+            // Tab functionality
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const targetContent = document.getElementById(`${targetTab}-tab`);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+
+            // Initialize calendar
+            initializeMoodCalendar();
+
+            // Load and display mood history
+            loadMoodHistory();
+            
+            // Add test functionality
+            console.log('Adding test functionality');
+            
+            // Test mood selection
+            setTimeout(() => {
+                console.log('Testing mood selection...');
+                const firstMoodOption = document.querySelector('.mood-option');
+                if (firstMoodOption) {
+                    console.log('Found first mood option, simulating click');
+                    firstMoodOption.click();
+                } else {
+                    console.error('No mood options found for testing');
+                }
+            }, 1000);
+
+            // User menu functionality
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    userManager.logout();
+                });
+            }
+
+            // User profile and settings (placeholder functionality)
+            const userProfile = document.getElementById('user-profile');
+            const userSettings = document.getElementById('user-settings');
+            
+            if (userProfile) {
+                userProfile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Profile feature coming soon!');
+                });
+            }
+            
+            if (userSettings) {
+                userSettings.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Settings feature coming soon!');
+                });
+            }
+        });
+
+
+
+        // Helper functions
+        function showMoodSuccess(entry) {
+            const moodEmoji = document.querySelector(`[data-mood="${entry.mood}"] .mood-emoji`).textContent;
+            const successMessage = document.createElement('div');
+            successMessage.className = 'mood-success';
+            successMessage.innerHTML = `
+                <div class="success-content">
+                    <span class="success-emoji">${moodEmoji}</span>
+                    <h4>Mood Entry Saved!</h4>
+                    <p>Your ${entry.mood} mood has been recorded for ${entry.date}</p>
+                </div>
+            `;
+            
+            // Add success message to page
+            const moodTracker = document.querySelector('.mood-tracker');
+            moodTracker.appendChild(successMessage);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                successMessage.remove();
+            }, 3000);
+        }
+
+        // User-specific mood tracking functions
+        function saveMoodEntry(entry) {
+            userManager.updateMoodHistory(entry);
+            console.log('Mood entry saved for user:', userManager.getCurrentUser().name);
+        }
+
+        function loadMoodHistory() {
+            const moodHistory = userManager.getMoodHistory();
+            console.log('Loaded mood history for user:', userManager.getCurrentUser().name, 'Entries:', moodHistory.length);
+            return moodHistory;
+        }
+
+        function updateMoodChart(moodHistory) {
+            // Update chart with user's mood history
+            console.log('Updating mood chart with user data');
+        }
+
+        function initializeMoodCalendar() {
+            // Initialize calendar with user's mood data
+            console.log('Initializing mood calendar for user');
+        }
+
+        function resetMoodForm() {
+            console.log('Resetting mood form');
+            // Reset mood selection
+            document.querySelectorAll('.mood-option').forEach(opt => opt.classList.remove('selected'));
+            selectedMood = null;
+            selectedMoodValue = null;
+
+            // Reset form fields
+            document.querySelectorAll('.checkbox-item input').forEach(cb => cb.checked = false);
+            const energySlider = document.getElementById('energy-level');
+            if (energySlider) energySlider.value = 5;
+            const notesField = document.getElementById('mood-notes');
+            if (notesField) notesField.value = '';
+
+            // Hide details section
+            const moodDetails = document.getElementById('mood-details');
+            if (moodDetails) moodDetails.style.display = 'none';
+        }
+
+
+
+        // Helper functions
+        function saveMoodEntry(entry) {
+            let moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+            moodHistory.push(entry);
+            localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+        }
+
+
+
+        function initializeMoodCalendar() {
+            const calendarGrid = document.querySelector('.calendar-grid');
+            if (!calendarGrid) return;
+
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+            // Create calendar header
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                // Check if there's mood data for this day
+                const moodData = getMoodForDate(day, currentMonth, currentYear);
+                if (moodData) {
+                    dayElement.classList.add('has-mood');
+                    dayElement.setAttribute('data-mood', moodData.mood);
+                    dayElement.setAttribute('data-value', moodData.value);
+                }
+
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function getMoodForDate(day, month, year) {
+            const moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+            const targetDate = new Date(year, month, day).toLocaleDateString();
+            
+            return moodHistory.find(entry => entry.date === targetDate);
+        }
+
+        function loadMoodHistory() {
+            const moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
+            
+            // Update weekly chart with real data
+            updateWeeklyChart(moodHistory);
+            
+            // Update insights with real data
+            updateMoodInsights(moodHistory);
+        }
+
+        function updateWeeklyChart(moodHistory) {
+            // This would update the chart bars with real mood data
+            // For now, we'll keep the static data as placeholder
+            console.log('Weekly chart would be updated with:', moodHistory);
+        }
+
+        function updateMoodInsights(moodHistory) {
+            // This would calculate and update insights based on real data
+            console.log('Insights would be updated with:', moodHistory);
+        }
+
+        // Animate resource cards when they come into view
+        const resourceCards = document.querySelectorAll('.resource-card');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        resourceCards.forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add a little floating animation to the first AI message
+        const firstAiMessage = document.querySelector('.ai-message');
+        if (firstAiMessage) {
+            setInterval(() => {
+                firstAiMessage.style.transform = `translateY(${Math.sin(Date.now() / 1000) * 3}px)`;
+            }, 50);
+        }
+
+        // Dropdown functionality for PC only
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('nav ul li');
+            const dropdowns = document.querySelectorAll('.dropdown-content');
+
+            function closeAllDropdowns() {
+                dropdowns.forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                    dropdown.style.opacity = '0';
+                    dropdown.style.transform = 'translateX(-50%) translateY(0px)';
+                });
+            }
+
+            if (window.innerWidth > 768) { // PC only
+                navItems.forEach(item => {
+                    const link = item.querySelector('a');
+                    const dropdown = item.querySelector('.dropdown-content');
+
+                    if (dropdown) {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const isOpen = dropdown.style.display === 'block';
+                            closeAllDropdowns();
+                            if (!isOpen) {
+                                dropdown.style.display = 'block';
+                                setTimeout(() => {
+                                    dropdown.style.opacity = '1';
+                                    dropdown.style.transform = 'translateX(-50%) translateY(5px)';
+                                }, 10);
+                            }
+                        });
+                    }
+                });
+
+                // Close dropdown if clicked outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('nav ul li')) {
+                        closeAllDropdowns();
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create wrapper flex container
+            const splitContainer = document.createElement('div');
+            splitContainer.style.display = 'flex';
+            splitContainer.style.flexDirection = 'row';
+            splitContainer.style.height = '100%';
+            splitContainer.style.gap = '20px';
+
+            // Get the current main container (chat + mood tracker)
+            const oldMain = document.querySelector('main.container');
+
+            // Create new container for right (existing content)
+            const rightPane = document.createElement('div');
+            rightPane.style.flex = '1';
+            rightPane.style.display = 'flex';
+            rightPane.style.flexDirection = 'column';
+            rightPane.style.gap = '20px';
+            rightPane.appendChild(oldMain);
+
+            // Create left pane for Detox
+            const leftPane = document.createElement('div');
+            leftPane.style.flex = '1';
+            leftPane.style.padding = '32px 20px';
+            leftPane.style.display = 'flex';
+            leftPane.style.flexDirection = 'column';
+            leftPane.style.justifyContent = 'flex-start';
+            leftPane.style.alignItems = 'center';
+            leftPane.style.background = 'linear-gradient(135deg, #e6e7ff 60%, #f9f9ff 100%)';
+            leftPane.style.borderRight = '1px solid rgba(127,129,245,0.15)';
+            leftPane.style.backdropFilter = 'blur(8px)';
+            leftPane.style.borderRadius = '16px';
+            leftPane.style.boxShadow = '0 4px 24px rgba(127,129,245,0.08)';
+            leftPane.style.minWidth = '340px';
+            leftPane.style.maxWidth = '420px';
+
+            // Detox section content
+            const detoxTitle = document.createElement('h2');
+            detoxTitle.textContent = '🌿 Digital Detox Retreat';
+            detoxTitle.style.color = '#7F81F5';
+            detoxTitle.style.marginBottom = '10px';
+            detoxTitle.style.fontWeight = '700';
+            detoxTitle.style.letterSpacing = '0.5px';
+
+            // Daily Challenge
+            const activities = [
+                { icon: '🌳', title: 'Nature Walks', desc: 'Clear your mind by walking in green spaces.', tips: 'Leave your phone at home and focus on the sights, sounds, and smells of nature.' },
+                { icon: '📓', title: 'Journaling', desc: 'Reflect on your day without any distractions.', tips: 'Write about your feelings, goals, or gratitude. Try a prompt: "Today I am grateful for..."' },
+                { icon: '🧘', title: 'Meditation', desc: 'Practice quiet time without screens.', tips: 'Try a 5-minute breathing exercise or guided meditation. Focus on your breath.' },
+                { icon: '🎨', title: 'Art Therapy', desc: 'Draw, paint, or create something by hand.', tips: 'Doodle, color, or paint. Let your creativity flow without judgment.' },
+                { icon: '📴', title: 'Silent Hour', desc: 'Set aside 1 hour of total screen silence.', tips: 'Turn off all devices. Read a book, stretch, or simply relax.' }
+            ];
+            const dailyChallenge = activities[Math.floor(Math.random() * activities.length)];
+            const challengeCard = document.createElement('div');
+            challengeCard.className = 'detox-challenge-card';
+            challengeCard.innerHTML = `
+                <div class="challenge-icon">${dailyChallenge.icon}</div>
+                <div class="challenge-content">
+                    <div class="challenge-title">Daily Detox Challenge</div>
+                    <div class="challenge-desc"><strong>${dailyChallenge.title}</strong>: ${dailyChallenge.desc}</div>
+                    <button class="challenge-btn">Try Now</button>
+                </div>
+            `;
+            challengeCard.querySelector('.challenge-btn').onclick = () => {
+                alert(`Tip for ${dailyChallenge.title}:\n\n${dailyChallenge.tips}`);
+            };
+            challengeCard.style.marginBottom = '18px';
+
+            // Motivational quote
+            const quotes = [
+                '“Almost everything will work again if you unplug it for a few minutes, including you.” – Anne Lamott',
+                '“Disconnect to reconnect.”',
+                '“Your mind is your best screen. Give it some time offline.”',
+                '“Sometimes you need to step outside, get some air, and remind yourself of who you are.”',
+                '“The best app for your health is airplane mode.”'
+            ];
+            const quote = document.createElement('div');
+            quote.className = 'detox-quote';
+            quote.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+            quote.style.margin = '18px 0 10px 0';
+            quote.style.fontStyle = 'italic';
+            quote.style.color = '#7F81F5';
+            quote.style.textAlign = 'center';
+            quote.style.fontSize = '1.05rem';
+
+            // Activities grid
+            const detoxGrid = document.createElement('div');
+            detoxGrid.className = 'detox-activity-grid';
+            activities.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'detox-activity-card';
+                card.innerHTML = `
+                    <div class="detox-activity-icon">${item.icon}</div>
+                    <div class="detox-activity-title">${item.title}</div>
+                    <div class="detox-activity-desc">${item.desc}</div>
+                    <button class="detox-activity-btn">Get Tips</button>
+                `;
+                card.querySelector('.detox-activity-btn').onclick = () => {
+                    alert(`Tips for ${item.title}:\n\n${item.tips}`);
+                };
+                detoxGrid.appendChild(card);
+            });
+            detoxGrid.style.display = 'grid';
+            detoxGrid.style.gridTemplateColumns = '1fr';
+            detoxGrid.style.gap = '18px';
+            detoxGrid.style.width = '100%';
+            detoxGrid.style.margin = '0 auto 18px auto';
+
+            // Fun fact
+            const funFacts = [
+                'Did you know? The average person checks their phone 96 times a day.',
+                'Fact: Just 20 minutes in nature can lower stress hormones.',
+                'Tip: Turning off notifications can boost your focus by 30%.',
+                'Fact: Blue light from screens can disrupt your sleep cycle.',
+                'Did you know? Drawing or doodling can reduce anxiety and improve mood.'
+            ];
+            const funFact = document.createElement('div');
+            funFact.className = 'detox-fun-fact';
+            funFact.textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+            funFact.style.margin = '10px 0 0 0';
+            funFact.style.fontSize = '0.98rem';
+            funFact.style.color = '#5D5FEF';
+            funFact.style.textAlign = 'center';
+            funFact.style.background = 'rgba(127,129,245,0.07)';
+            funFact.style.borderRadius = '8px';
+            funFact.style.padding = '10px 12px';
+
+            // Assemble Detox section
+            leftPane.appendChild(detoxTitle);
+            leftPane.appendChild(challengeCard);
+            leftPane.appendChild(quote);
+            leftPane.appendChild(detoxGrid);
+            leftPane.appendChild(funFact);
+
+            // Combine left and right into splitContainer
+            splitContainer.appendChild(leftPane);
+            splitContainer.appendChild(rightPane);
+
+            // Insert splitContainer in place of old main
+            const parent = document.querySelector('body');
+            parent.insertBefore(splitContainer, document.querySelector('footer'));
+        });
+
+        // Ensure dropdowns appear above all other content
+        document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+            dropdown.style.zIndex = '9999'; // High enough to stay on top
+        });
+
+        // Make sure the nav parent is not clipping the dropdown
+        const nav = document.querySelector('nav');
+        nav.style.position = 'relative'; // Needed for absolute children to anchor
+        nav.style.zIndex = '999'; // Keep nav above content
+
+        // Optional: set the dropdown item parents (li) to relative too
+        document.querySelectorAll('nav ul li').forEach(li => {
+            li.style.position = 'relative';
+        });
+
+        // Focus pods functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('toggle-focus-pods');
+            const focusPane = document.getElementById('focus-pod-pane');
+            const closeBtn = document.getElementById('close-focus-pods');
+            const bookingModal = document.getElementById('booking-modal');
+            const modalClose = document.getElementById('modal-close');
+            const bookingForm = document.getElementById('booking-form');
+
+            // Toggle focus pods pane
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                focusPane.classList.toggle('active');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                focusPane.classList.remove('active');
+            });
+
+            // City selection functionality
+            const cityItems = document.querySelectorAll('#focus-pod-pane ul li');
+            const cityLocations = document.querySelectorAll('.city-locations');
+
+            cityItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const city = item.getAttribute('data-city');
+                    
+                    // Hide all location sections
+                    cityLocations.forEach(location => {
+                        location.classList.remove('active');
+                    });
+                    
+                    // Show selected city locations
+                    const selectedLocations = document.getElementById(`${city}-locations`);
+                    if (selectedLocations) {
+                        selectedLocations.classList.add('active');
+                    }
+                });
+            });
+
+            // Booking button functionality
+            const bookingBtns = document.querySelectorAll('.booking-btn');
+            
+            bookingBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const location = btn.getAttribute('data-location');
+                    const city = btn.getAttribute('data-city');
+                    
+                    // Set location name in modal
+                    document.getElementById('location-name').value = `${location}, ${city}`;
+                    
+                    // Show booking modal
+                    bookingModal.classList.add('active');
+                });
+            });
+
+            // Close modal
+            modalClose.addEventListener('click', () => {
+                bookingModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            bookingModal.addEventListener('click', (e) => {
+                if (e.target === bookingModal) {
+                    bookingModal.classList.remove('active');
+                }
+            });
+
+            // Handle booking form submission
+            bookingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    location: document.getElementById('location-name').value,
+                    name: document.getElementById('customer-name').value,
+                    phone: document.getElementById('customer-phone').value,
+                    email: document.getElementById('customer-email').value,
+                    date: document.getElementById('session-date').value,
+                    time: document.getElementById('session-time').value,
+                    type: document.getElementById('session-type').value,
+                    requests: document.getElementById('special-requests').value
+                };
+
+                // Validate date (must be future date)
+                const selectedDate = new Date(formData.date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < today) {
+                    alert('Please select a future date for your session.');
+                    return;
+                }
+
+                // Show success message
+                const successMessage = document.createElement('div');
+                successMessage.className = 'success-message';
+                successMessage.innerHTML = `
+                    <h3>✅ Booking Confirmed!</h3>
+                    <p><strong>Location:</strong> ${formData.location}</p>
+                    <p><strong>Date:</strong> ${formData.date} at ${formData.time}</p>
+                    <p><strong>Session Type:</strong> ${formData.type}</p>
+                    <p>We'll send a confirmation email to ${formData.email}</p>
+                    <p>Thank you for choosing MindEase! 🧘‍♀️</p>
+                `;
+
+                // Replace form with success message
+                bookingForm.innerHTML = '';
+                bookingForm.appendChild(successMessage);
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    bookingModal.classList.remove('active');
+                    // Reset form
+                    setTimeout(() => {
+                        bookingForm.innerHTML = `
+                            <div class="form-group">
+                                <label for="location-name">Location:</label>
+                                <input type="text" id="location-name" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-name">Full Name:</label>
+                                <input type="text" id="customer-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone">Phone Number:</label>
+                                <input type="tel" id="customer-phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-email">Email:</label>
+                                <input type="email" id="customer-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="session-date">Preferred Date:</label>
+                                <input type="date" id="session-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="session-time">Preferred Time:</label>
+                                <select id="session-time" required>
+                                    <option value="">Select a time</option>
+                                    <option value="09:00">9:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="15:00">3:00 PM</option>
+                                    <option value="16:00">4:00 PM</option>
+                                    <option value="17:00">5:00 PM</option>
+                                    <option value="18:00">6:00 PM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="session-type">Session Type:</label>
+                                <select id="session-type" required>
+                                    <option value="">Select session type</option>
+                                    <option value="anxiety">Anxiety Management</option>
+                                    <option value="stress">Stress Relief</option>
+                                    <option value="depression">Depression Support</option>
+                                    <option value="general">General Wellness</option>
+                                    <option value="crisis">Crisis Support</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="special-requests">Special Requests (Optional):</label>
+                                <textarea id="special-requests" placeholder="Any specific needs or preferences..."></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">📅 Confirm Booking</button>
+                        `;
+                    }, 1000);
+                }, 3000);
+
+                // Log booking data (in a real app, this would be sent to a server)
+                console.log('Booking submitted:', formData);
+            });
+
+            // Set minimum date to today
+            const dateInput = document.getElementById('session-date');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+        });
+
+        // Contact form functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactForm = document.getElementById('contact-form');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const formData = {
+                        name: document.getElementById('contact-name').value,
+                        email: document.getElementById('contact-email').value,
+                        phone: document.getElementById('contact-phone').value,
+                        subject: document.getElementById('contact-subject').value,
+                        message: document.getElementById('contact-message').value,
+                        newsletter: document.getElementById('contact-newsletter').checked
+                    };
+
+                    // Basic validation
+                    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(formData.email)) {
+                        alert('Please enter a valid email address.');
+                        return;
+                    }
+
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'contact-success';
+                    successMessage.innerHTML = `
+                        <h3>✅ Message Sent Successfully!</h3>
+                        <p>Thank you for contacting MindEase, ${formData.name}!</p>
+                        <p>We'll get back to you at <strong>${formData.email}</strong> within 24 hours.</p>
+                        <p>If this is urgent, please call our support line: <strong>+91 1800-MINDEASE</strong></p>
+                    `;
+
+                    // Replace form with success message
+                    contactForm.innerHTML = '';
+                    contactForm.appendChild(successMessage);
+
+                    // Log form data (in a real app, this would be sent to a server)
+                    console.log('Contact form submitted:', formData);
+
+                    // Reset form after 5 seconds
+                    setTimeout(() => {
+                        contactForm.innerHTML = `
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contact-name">Full Name *</label>
+                                    <input type="text" id="contact-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-email">Email *</label>
+                                    <input type="email" id="contact-email" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contact-phone">Phone Number</label>
+                                    <input type="tel" id="contact-phone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contact-subject">Subject *</label>
+                                    <select id="contact-subject" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="technical">Technical Support</option>
+                                        <option value="booking">Booking Support</option>
+                                        <option value="feedback">Feedback & Suggestions</option>
+                                        <option value="partnership">Partnership Opportunities</option>
+                                        <option value="press">Press & Media</option>
+                                        <option value="crisis">Crisis Support</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Message *</label>
+                                <textarea id="contact-message" rows="5" required placeholder="Tell us how we can help you..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="contact-newsletter">
+                                    <span class="checkmark"></span>
+                                    Subscribe to our newsletter for mental health tips and updates
+                                </label>
+                            </div>
+                            <button type="submit" class="contact-submit-btn">📤 Send Message</button>
+                        `;
+                    }, 5000);
+                });
+            }
+
+            // Emergency number click functionality
+            const emergencyNumbers = document.querySelectorAll('.emergency-number');
+            emergencyNumbers.forEach(number => {
+                number.addEventListener('click', () => {
+                    const phoneNumber = number.textContent;
+                    if (confirm(`Call ${phoneNumber}?`)) {
+                        // In a real app, this would initiate a phone call
+                        console.log(`Initiating call to ${phoneNumber}`);
+                        alert(`Calling ${phoneNumber}...`);
+                    }
+                });
+            });
+
+            // Smooth scrolling for contact link
+            const contactLink = document.querySelector('a[href="#contact"]');
+            if (contactLink) {
+                contactLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const contactSection = document.getElementById('contact');
+                    if (contactSection) {
+                        contactSection.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            }
+        });
+
+        // Dropdown Contact Actions
+        function openContactModalAndSetSubject(subjectValue) {
+            const contactModal = document.getElementById('contact-modal');
+            if (contactModal) {
+                contactModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    const subjectSelect = document.getElementById('modal-contact-subject');
+                    if (subjectSelect) {
+                        subjectSelect.value = subjectValue;
+                        subjectSelect.dispatchEvent(new Event('change'));
+                    }
+                    const nameInput = document.getElementById('modal-contact-name');
+                    if (nameInput) nameInput.focus();
+                }, 300);
+            }
+        }
+        document.getElementById('dropdown-feedback').addEventListener('click', function(e) {
+            e.preventDefault();
+            openContactModalAndSetSubject('feedback');
+        });
+        document.getElementById('dropdown-bug').addEventListener('click', function(e) {
+            e.preventDefault();
+            openContactModalAndSetSubject('technical');
+        });
+        document.getElementById('dropdown-partner').addEventListener('click', function(e) {
+            e.preventDefault();
+            openContactModalAndSetSubject('partnership');
+        });
+        document.getElementById('dropdown-press').addEventListener('click', function(e) {
+            e.preventDefault();
+            openContactModalAndSetSubject('press');
+        });
+        document.getElementById('dropdown-careers').addEventListener('click', function(e) {
+            e.preventDefault();
+            openContactModalAndSetSubject('general');
+        });
+
+        // Mission Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const missionModal = document.getElementById('mission-modal');
+            const missionClose = document.getElementById('mission-close');
+            const missionLink = document.getElementById('dropdown-mission');
+
+            if (missionModal && missionClose && missionLink) {
+                function openMissionModal() {
+                    missionModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMissionModal() {
+                    missionModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                missionLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openMissionModal();
+                });
+
+                missionClose.addEventListener('click', closeMissionModal);
+
+                // Close modal when clicking outside
+                missionModal.addEventListener('click', function(e) {
+                    if (e.target === missionModal) {
+                        closeMissionModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && missionModal.classList.contains('active')) {
+                        closeMissionModal();
+                    }
+                });
+            }
+        });
+
+        // How It Works Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const howItWorksModal = document.getElementById('how-it-works-modal');
+            const howItWorksClose = document.getElementById('how-it-works-close');
+            const howItWorksLink = document.getElementById('dropdown-how-it-works');
+
+            if (howItWorksModal && howItWorksClose && howItWorksLink) {
+                function openHowItWorksModal() {
+                    howItWorksModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeHowItWorksModal() {
+                    howItWorksModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                howItWorksLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openHowItWorksModal();
+                });
+
+                howItWorksClose.addEventListener('click', closeHowItWorksModal);
+
+                // Close modal when clicking outside
+                howItWorksModal.addEventListener('click', function(e) {
+                    if (e.target === howItWorksModal) {
+                        closeHowItWorksModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && howItWorksModal.classList.contains('active')) {
+                        closeHowItWorksModal();
+                    }
+                });
+            }
+        });
+
+        // Privacy Policy Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const privacyModal = document.getElementById('privacy-modal');
+            const privacyClose = document.getElementById('privacy-close');
+            const privacyLink = document.getElementById('dropdown-privacy');
+
+            if (privacyModal && privacyClose && privacyLink) {
+                function openPrivacyModal() {
+                    privacyModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closePrivacyModal() {
+                    privacyModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                privacyLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openPrivacyModal();
+                });
+
+                privacyClose.addEventListener('click', closePrivacyModal);
+
+                // Close modal when clicking outside
+                privacyModal.addEventListener('click', function(e) {
+                    if (e.target === privacyModal) {
+                        closePrivacyModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && privacyModal.classList.contains('active')) {
+                        closePrivacyModal();
+                    }
+                });
+            }
+        });
+
+        // Team Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamModal = document.getElementById('team-modal');
+            const teamClose = document.getElementById('team-close');
+            const teamLink = document.getElementById('dropdown-team');
+
+            if (teamModal && teamClose && teamLink) {
+                function openTeamModal() {
+                    teamModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeTeamModal() {
+                    teamModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                teamLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openTeamModal();
+                });
+
+                teamClose.addEventListener('click', closeTeamModal);
+
+                // Close modal when clicking outside
+                teamModal.addEventListener('click', function(e) {
+                    if (e.target === teamModal) {
+                        closeTeamModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && teamModal.classList.contains('active')) {
+                        closeTeamModal();
+                    }
+                });
+            }
+        });
+
+        // Contact Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactModal = document.getElementById('contact-modal');
+            const contactClose = document.getElementById('contact-close');
+            const contactLink = document.getElementById('dropdown-contact');
+
+            if (contactModal && contactClose && contactLink) {
+                function openContactModal() {
+                    contactModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeContactModal() {
+                    contactModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                contactLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openContactModal();
+                });
+
+                contactClose.addEventListener('click', closeContactModal);
+
+                // Close modal when clicking outside
+                contactModal.addEventListener('click', function(e) {
+                    if (e.target === contactModal) {
+                        closeContactModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && contactModal.classList.contains('active')) {
+                        closeContactModal();
+                    }
+                });
+            }
+        });
+
+        // Mood Tracking Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track Your Mood Modal
+            const trackMoodModal = document.getElementById('track-mood-modal');
+            const trackMoodClose = document.getElementById('track-mood-close');
+            const trackMoodLink = document.getElementById('dropdown-track-mood');
+
+            if (trackMoodModal && trackMoodClose && trackMoodLink) {
+                function openTrackMoodModal() {
+                    trackMoodModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeTrackMoodModal() {
+                    trackMoodModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                trackMoodLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openTrackMoodModal();
+                });
+
+                trackMoodClose.addEventListener('click', closeTrackMoodModal);
+
+                // Close modal when clicking outside
+                trackMoodModal.addEventListener('click', function(e) {
+                    if (e.target === trackMoodModal) {
+                        closeTrackMoodModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && trackMoodModal.classList.contains('active')) {
+                        closeTrackMoodModal();
+                    }
+                });
+            }
+
+            // Mood History Modal
+            const moodHistoryModal = document.getElementById('mood-history-modal');
+            const moodHistoryClose = document.getElementById('mood-history-close');
+            const moodHistoryLink = document.getElementById('dropdown-mood-history');
+
+            if (moodHistoryModal && moodHistoryClose && moodHistoryLink) {
+                function openMoodHistoryModal() {
+                    moodHistoryModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMoodHistoryModal() {
+                    moodHistoryModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                moodHistoryLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openMoodHistoryModal();
+                });
+
+                moodHistoryClose.addEventListener('click', closeMoodHistoryModal);
+
+                // Close modal when clicking outside
+                moodHistoryModal.addEventListener('click', function(e) {
+                    if (e.target === moodHistoryModal) {
+                        closeMoodHistoryModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && moodHistoryModal.classList.contains('active')) {
+                        closeMoodHistoryModal();
+                    }
+                });
+            }
+
+            // Mood Insights Modal
+            const moodInsightsModal = document.getElementById('mood-insights-modal');
+            const moodInsightsClose = document.getElementById('mood-insights-close');
+            const moodInsightsLink = document.getElementById('dropdown-mood-insights');
+
+            if (moodInsightsModal && moodInsightsClose && moodInsightsLink) {
+                function openMoodInsightsModal() {
+                    moodInsightsModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMoodInsightsModal() {
+                    moodInsightsModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                moodInsightsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openMoodInsightsModal();
+                });
+
+                moodInsightsClose.addEventListener('click', closeMoodInsightsModal);
+
+                // Close modal when clicking outside
+                moodInsightsModal.addEventListener('click', function(e) {
+                    if (e.target === moodInsightsModal) {
+                        closeMoodInsightsModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && moodInsightsModal.classList.contains('active')) {
+                        closeMoodInsightsModal();
+                    }
+                });
+            }
+
+            // Mood Goals Modal
+            const moodGoalsModal = document.getElementById('mood-goals-modal');
+            const moodGoalsClose = document.getElementById('mood-goals-close');
+            const moodGoalsLink = document.getElementById('dropdown-mood-goals');
+
+            if (moodGoalsModal && moodGoalsClose && moodGoalsLink) {
+                function openMoodGoalsModal() {
+                    moodGoalsModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMoodGoalsModal() {
+                    moodGoalsModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+
+                moodGoalsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openMoodGoalsModal();
+                });
+
+                moodGoalsClose.addEventListener('click', closeMoodGoalsModal);
+
+                // Close modal when clicking outside
+                moodGoalsModal.addEventListener('click', function(e) {
+                    if (e.target === moodGoalsModal) {
+                        closeMoodGoalsModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && moodGoalsModal.classList.contains('active')) {
+                        closeMoodGoalsModal();
+                    }
+                });
+            }
+        });
+
+    </script>
+
+    <!-- Mission Modal -->
+    <div id="mission-modal" class="mission-modal">
+        <div class="mission-content">
+            <div class="mission-header">
+                <span class="mission-close" id="mission-close">&times;</span>
+                <h2>🌟 Our Mission</h2>
+                <p>Empowering mental wellness through compassionate AI technology</p>
+            </div>
+            <div class="mission-body">
+                <div class="mission-section">
+                    <h3>🎯 Mission Statement</h3>
+                    <p>At MindEase, we believe that mental health support should be accessible, immediate, and compassionate. Our mission is to bridge the gap between traditional mental health services and the growing need for 24/7 emotional support by providing an AI-powered therapy companion that offers personalized care, crisis intervention, and wellness guidance to anyone, anywhere, at any time.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🔮 Our Vision</h3>
+                    <p>We envision a world where mental health support is as commonplace and accessible as physical health care. A world where no one has to face their struggles alone, where technology serves as a bridge to human connection rather than a barrier, and where every individual has the tools and support they need to thrive emotionally and mentally.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>💎 Our Values</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">🤝</div>
+                            <div class="value-title">Compassion</div>
+                            <div class="value-desc">Every interaction is guided by empathy and understanding</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🔒</div>
+                            <div class="value-title">Privacy</div>
+                            <div class="value-desc">Your mental health journey is sacred and protected</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">⚡</div>
+                            <div class="value-title">Accessibility</div>
+                            <div class="value-desc">Support available 24/7, regardless of location or time</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🔬</div>
+                            <div class="value-title">Evidence-Based</div>
+                            <div class="value-desc">Our approach is grounded in mental health research</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🌱</div>
+                            <div class="value-title">Growth</div>
+                            <div class="value-desc">Continuous learning and improvement in everything we do</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🤲</div>
+                            <div class="value-title">Inclusivity</div>
+                            <div class="value-desc">Support for all backgrounds, identities, and experiences</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🎯 Our Goals</h3>
+                    <ul>
+                        <li><strong>Immediate Support:</strong> Provide instant emotional support and crisis intervention to anyone in need, 24/7</li>
+                        <li><strong>Reduce Stigma:</strong> Normalize mental health conversations and make seeking help a sign of strength</li>
+                        <li><strong>Bridge Gaps:</strong> Connect users with professional mental health resources when needed</li>
+                        <li><strong>Preventive Care:</strong> Help users develop healthy coping mechanisms and emotional resilience</li>
+                        <li><strong>Global Reach:</strong> Make mental health support accessible to underserved communities worldwide</li>
+                        <li><strong>Research & Innovation:</strong> Contribute to the advancement of AI in mental health care</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🌍 Our Impact</h3>
+                    <p>Since our inception, MindEase has been committed to making a meaningful difference in the lives of individuals struggling with mental health challenges. We believe that by combining cutting-edge AI technology with human-centered design and evidence-based therapeutic approaches, we can create a more compassionate and accessible mental health ecosystem.</p>
+                    <p>Our platform serves as a first line of support, a companion for daily wellness, and a bridge to professional care when needed. We're not here to replace human therapists, but to complement and enhance the mental health support system, ensuring that no one has to face their struggles alone.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Modal -->
+    <div id="how-it-works-modal" class="mission-modal">
+        <div class="mission-content">
+            <div class="mission-header">
+                <span class="mission-close" id="how-it-works-close">&times;</span>
+                <h2>⚙️ How It Works</h2>
+                <p>Understanding the technology behind MindEase's AI therapy companion</p>
+            </div>
+            <div class="mission-body">
+                <div class="mission-section">
+                    <h3>🤖 AI Technology Overview</h3>
+                    <p>MindEase uses advanced artificial intelligence to provide personalized mental health support. Our AI system is trained on extensive mental health data and therapeutic techniques, enabling it to understand emotional states, provide appropriate responses, and offer evidence-based coping strategies.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🔄 The Conversation Flow</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">💬</div>
+                            <div class="value-title">1. Start Chat</div>
+                            <div class="value-desc">Begin a conversation with your AI companion anytime, anywhere</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🧠</div>
+                            <div class="value-title">2. AI Analysis</div>
+                            <div class="value-desc">Our AI analyzes your message to understand your emotional state</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">💡</div>
+                            <div class="value-title">3. Smart Response</div>
+                            <div class="value-desc">Receive personalized, compassionate responses based on your needs</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🛠️</div>
+                            <div class="value-title">4. Tools & Resources</div>
+                            <div class="value-desc">Access coping strategies, exercises, and professional resources</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🎯 Key Features Explained</h3>
+                    <ul>
+                        <li><strong>Real-time Chat:</strong> Instant responses with simulated typing delays for a natural conversation feel</li>
+                        <li><strong>Emotion Recognition:</strong> AI identifies anxiety, sadness, stress, anger, and other emotional states</li>
+                        <li><strong>Personalized Responses:</strong> Tailored advice based on your specific situation and needs</li>
+                        <li><strong>Crisis Detection:</strong> Automatic identification of crisis situations with appropriate escalation</li>
+                        <li><strong>Mood Tracking:</strong> Daily mood monitoring to identify patterns and trends</li>
+                        <li><strong>Digital Detox:</strong> Offline activities and wellness challenges for mental health</li>
+                        <li><strong>Focus Pods:</strong> Physical locations for in-person therapy sessions when needed</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🔒 Privacy & Security</h3>
+                    <p>Your privacy is our top priority. All conversations are processed securely and can be completely anonymous. We use industry-standard encryption to protect your data, and you have full control over your information. Our AI operates entirely within your browser, ensuring maximum privacy and security.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>📊 Data & Learning</h3>
+                    <p>MindEase continuously learns and improves from interactions while maintaining strict privacy standards. Our AI system is regularly updated with the latest mental health research and therapeutic techniques to provide the most effective support possible.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🚨 Crisis Support</h3>
+                    <p>While MindEase provides valuable support, we recognize that some situations require immediate professional intervention. Our system includes automatic crisis detection and provides direct connections to emergency services and crisis hotlines when needed.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🔗 Integration & Accessibility</h3>
+                    <p>MindEase is designed to work seamlessly across all devices and platforms. Whether you're on your phone, tablet, or computer, you can access the same level of support. Our platform is also designed with accessibility in mind, ensuring everyone can benefit from our services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="mission-modal">
+        <div class="mission-content">
+            <div class="mission-header">
+                <span class="mission-close" id="privacy-close">&times;</span>
+                <h2>🔒 Privacy Policy</h2>
+                <p>Your privacy and data security are our top priorities</p>
+            </div>
+            <div class="mission-body">
+                <div class="mission-section">
+                    <h3>📋 Policy Overview</h3>
+                    <p>This Privacy Policy explains how MindEase collects, uses, and protects your personal information when you use our AI therapy companion service. We are committed to transparency and ensuring you have full control over your data.</p>
+                    <p><strong>Last Updated:</strong> December 2024</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>📊 Information We Collect</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">💬</div>
+                            <div class="value-title">Conversation Data</div>
+                            <div class="value-desc">Your chat messages and interactions with our AI companion</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">😊</div>
+                            <div class="value-title">Mood Tracking</div>
+                            <div class="value-desc">Daily mood entries and emotional patterns you choose to share</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">📱</div>
+                            <div class="value-title">Usage Data</div>
+                            <div class="value-desc">How you interact with our platform and features</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🔧</div>
+                            <div class="value-title">Technical Data</div>
+                            <div class="value-desc">Device information and browser data for service optimization</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🎯 How We Use Your Information</h3>
+                    <ul>
+                        <li><strong>Provide AI Therapy:</strong> Process your messages to deliver personalized responses and support</li>
+                        <li><strong>Improve Services:</strong> Analyze usage patterns to enhance our AI capabilities and user experience</li>
+                        <li><strong>Crisis Intervention:</strong> Detect and respond to crisis situations with appropriate resources</li>
+                        <li><strong>Personalization:</strong> Tailor recommendations and content based on your preferences</li>
+                        <li><strong>Research & Development:</strong> Develop new features while maintaining strict privacy standards</li>
+                        <li><strong>Legal Compliance:</strong> Meet regulatory requirements and protect against misuse</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🔐 Data Security & Protection</h3>
+                    <p>We implement industry-standard security measures to protect your information:</p>
+                    <ul>
+                        <li><strong>Encryption:</strong> All data is encrypted in transit and at rest using AES-256 encryption</li>
+                        <li><strong>Local Processing:</strong> AI conversations are processed entirely within your browser for maximum privacy</li>
+                        <li><strong>Access Controls:</strong> Strict access controls limit who can view your information</li>
+                        <li><strong>Regular Audits:</strong> We conduct regular security assessments and updates</li>
+                        <li><strong>Data Minimization:</strong> We only collect information necessary for providing our services</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🤝 Data Sharing & Third Parties</h3>
+                    <p>We are committed to protecting your privacy and do not sell your personal information. We may share data only in these limited circumstances:</p>
+                    <ul>
+                        <li><strong>Crisis Situations:</strong> When necessary to protect your safety or the safety of others</li>
+                        <li><strong>Legal Requirements:</strong> When required by law or to respond to legal process</li>
+                        <li><strong>Service Providers:</strong> With trusted partners who help us operate our service (under strict confidentiality agreements)</li>
+                        <li><strong>Research Partners:</strong> With academic institutions for mental health research (only with your explicit consent)</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>👤 Your Rights & Choices</h3>
+                    <p>You have complete control over your data and privacy:</p>
+                    <ul>
+                        <li><strong>Access:</strong> Request a copy of all personal information we have about you</li>
+                        <li><strong>Correction:</strong> Update or correct any inaccurate information</li>
+                        <li><strong>Deletion:</strong> Request deletion of your personal data at any time</li>
+                        <li><strong>Portability:</strong> Export your data in a machine-readable format</li>
+                        <li><strong>Opt-out:</strong> Choose not to participate in data collection for research purposes</li>
+                        <li><strong>Anonymous Use:</strong> Use our service without providing any personal information</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🍪 Cookies & Tracking</h3>
+                    <p>We use minimal cookies and tracking technologies to improve your experience:</p>
+                    <ul>
+                        <li><strong>Essential Cookies:</strong> Required for basic platform functionality</li>
+                        <li><strong>Analytics Cookies:</strong> Help us understand how our service is used (anonymized)</li>
+                        <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+                        <li><strong>No Third-party Tracking:</strong> We do not use third-party advertising or tracking cookies</li>
+                    </ul>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🌍 International Data Transfers</h3>
+                    <p>MindEase operates globally, and your data may be processed in different countries. We ensure that all data transfers comply with applicable privacy laws and maintain the same level of protection regardless of where your data is processed.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>👶 Children's Privacy</h3>
+                    <p>MindEase is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>📞 Contact Us</h3>
+                    <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
+                    <ul>
+                        <li><strong>Email:</strong> privacy@mindease.ai</li>
+                        <li><strong>Phone:</strong> +91 1800-MINDEASE</li>
+                        <li><strong>Address:</strong> MindEase Technologies Pvt. Ltd., 123 Innovation Park, Bangalore - 560001</li>
+                    </ul>
+                    <p>We will respond to your inquiry within 48 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Modal -->
+    <div id="team-modal" class="mission-modal">
+        <div class="mission-content">
+            <div class="mission-header">
+                <span class="mission-close" id="team-close">&times;</span>
+                <h2>👥 Meet Our Team</h2>
+                <p>The passionate minds behind MindEase's AI therapy companion</p>
+            </div>
+            <div class="mission-body">
+                <div class="mission-section">
+                    <h3>🌟 Leadership Team</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">👨‍💻</div>
+                            <div class="value-title">Rounak Ghosh</div>
+                            <div class="value-desc">Team Leader & Creator<br>Full-Stack Web Developer, Project Lead</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🧠 Clinical & Research Team</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">👩‍⚕️</div>
+                            <div class="value-title">Dr. Aaron Beck</div>
+                            <div class="value-desc">Lead Clinical Psychologist<br>Founder of Cognitive Behavioral Therapy</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍🔬</div>
+                            <div class="value-title">Dr. Daniel Kahneman</div>
+                            <div class="value-desc">Research Director<br>Nobel Laureate in Behavioral Economics</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👩‍⚕️</div>
+                            <div class="value-title">Dr. Marsha Linehan</div>
+                            <div class="value-desc">Child & Adolescent Specialist<br>Creator of Dialectical Behavior Therapy</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍⚕️</div>
+                            <div class="value-title">Dr. Viktor Frankl</div>
+                            <div class="value-desc">Crisis Intervention Specialist<br>Founder of Logotherapy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>💻 Technology Team</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">👩‍💻</div>
+                            <div class="value-title">Sneha Gupta</div>
+                            <div class="value-desc">Senior AI Engineer<br>Natural Language Processing Expert</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍💻</div>
+                            <div class="value-title">Arjun Mehta</div>
+                            <div class="value-desc">Full-Stack Developer<br>Frontend & Backend Specialist</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👩‍💻</div>
+                            <div class="value-title">Priya Nair</div>
+                            <div class="value-desc">Data Scientist<br>Machine Learning & Analytics</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍💻</div>
+                            <div class="value-title">Karan Sharma</div>
+                            <div class="value-desc">DevOps Engineer<br>Security & Infrastructure</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🎨 Design & User Experience</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">👩‍🎨</div>
+                            <div class="value-title">Zara Khan</div>
+                            <div class="value-desc">Senior UX Designer<br>Accessibility & Inclusive Design</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍🎨</div>
+                            <div class="value-title">Aditya Joshi</div>
+                            <div class="value-desc">UI Designer<br>Visual Design & Branding</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👩‍🎨</div>
+                            <div class="value-title">Riya Patel</div>
+                            <div class="value-desc">Interaction Designer<br>User Research & Testing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🤝 Support & Operations</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">👩‍💼</div>
+                            <div class="value-title">Maya Rao</div>
+                            <div class="value-desc">Head of Support<br>Mental Health Crisis Counselor</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👨‍💼</div>
+                            <div class="value-title">Suresh Kumar</div>
+                            <div class="value-desc">Operations Manager<br>Healthcare Operations Expert</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👩‍💼</div>
+                            <div class="value-title">Divya Sharma</div>
+                            <div class="value-desc">Community Manager<br>Mental Health Advocacy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🎯 Our Commitment</h3>
+                    <p>Our diverse team brings together expertise from clinical psychology, artificial intelligence, user experience design, and mental health advocacy. We're united by a shared mission to make mental health support accessible, compassionate, and effective for everyone.</p>
+                    <p>Every team member is committed to continuous learning and staying updated with the latest developments in mental health research, AI technology, and therapeutic practices to provide the best possible support to our users.</p>
+                </div>
+
+                <div class="mission-section">
+                    <h3>📞 Join Our Team</h3>
+                    <p>We're always looking for passionate individuals who share our vision of democratizing mental health support. If you're interested in joining our mission, please reach out:</p>
+                    <ul>
+                        <li><strong>Email:</strong> careers@mindease.ai</li>
+                        <li><strong>LinkedIn:</strong> linkedin.com/company/mindease-ai</li>
+                        <li><strong>Current Openings:</strong> Check our careers page for available positions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="mission-modal">
+        <div class="mission-content">
+            <div class="mission-header">
+                <span class="mission-close" id="contact-close">&times;</span>
+                <h2>📞 Get in Touch</h2>
+                <p>We're here to help and support you</p>
+            </div>
+            <div class="mission-body">
+                <div class="mission-section">
+                    <h3>📧 Contact Information</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">📧</div>
+                            <div class="value-title">Email Support</div>
+                            <div class="value-desc">support@mindease.ai<br>info@mindease.ai</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">📱</div>
+                            <div class="value-title">Phone Support</div>
+                            <div class="value-desc">+91 1800-MINDEASE<br>+91 98765-43210</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🏢</div>
+                            <div class="value-title">Head Office</div>
+                            <div class="value-desc">MindEase Technologies Pvt. Ltd.<br>123, Innovation Park, Bangalore</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">⏰</div>
+                            <div class="value-title">Support Hours</div>
+                            <div class="value-desc">24/7 AI Support<br>Human Support: Mon-Sat 9AM-6PM IST</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section">
+                    <h3>📝 Contact Form</h3>
+                    <form class="contact-form" id="modal-contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-contact-name">Full Name *</label>
+                                <input type="text" id="modal-contact-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-contact-email">Email *</label>
+                                <input type="email" id="modal-contact-email" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-contact-phone">Phone Number</label>
+                                <input type="tel" id="modal-contact-phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-contact-subject">Subject *</label>
+                                <select id="modal-contact-subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="booking">Booking Support</option>
+                                    <option value="feedback">Feedback & Suggestions</option>
+                                    <option value="partnership">Partnership Opportunities</option>
+                                    <option value="press">Press & Media</option>
+                                    <option value="crisis">Crisis Support</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-contact-message">Message *</label>
+                            <textarea id="modal-contact-message" rows="5" required placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="modal-contact-newsletter">
+                                <span class="checkmark"></span>
+                                Subscribe to our newsletter for mental health tips and updates
+                            </label>
+                        </div>
+                        <button type="submit" class="contact-submit-btn">📤 Send Message</button>
+                    </form>
+                </div>
+
+                <div class="mission-section">
+                    <h3>🚨 Emergency Resources</h3>
+                    <div class="mission-values">
+                        <div class="value-item">
+                            <div class="value-icon">🆘</div>
+                            <div class="value-title">National Crisis Helpline</div>
+                            <div class="value-desc">1800-599-0019<br>24/7 Crisis Support</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🏥</div>
+                            <div class="value-title">Emergency Services</div>
+                            <div class="value-desc">112<br>Police, Ambulance, Fire</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">🧠</div>
+                            <div class="value-title">Mental Health Helpline</div>
+                            <div class="value-desc">1800-266-2345<br>Professional Mental Health Support</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-icon">👥</div>
+                            <div class="value-title">Suicide Prevention</div>
+                            <div class="value-desc">1800-233-3330<br>24/7 Suicide Prevention Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Overlay -->
+    <div class="auth-overlay" id="auth-overlay" style="display: none;">
+        <div class="auth-message">
+            <h2>🔐 Authentication Required</h2>
+            <p>Please log in or create an account to access personalized mood tracking and therapy features.</p>
+            <a href="login.html" class="auth-btn">Go to Login</a>
+        </div>
+    </div>
+
+</body>
+
+</html>
