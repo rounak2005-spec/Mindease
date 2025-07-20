@@ -48,23 +48,178 @@ class ServerAnalytics {
     }
 
     trackLoginEvents() {
-        // Monitor login forms
+        // Enhanced login tracking with multiple methods
+        
+        // Method 1: Monitor login forms
         const loginForms = document.querySelectorAll('form');
         loginForms.forEach(form => {
             form.addEventListener('submit', (e) => {
                 const emailField = form.querySelector('input[type="email"]');
                 const passwordField = form.querySelector('input[type="password"]');
+                const usernameField = form.querySelector('input[name="username"]');
+                const loginButton = form.querySelector('button[type="submit"]');
                 
-                if (emailField && passwordField) {
-                    this.sendToServer({
+                if ((emailField && passwordField) || (usernameField && passwordField)) {
+                    const loginData = {
                         event: 'user_login',
-                        method: 'email',
+                        method: emailField ? 'email' : 'username',
                         timestamp: new Date().toISOString(),
-                        url: window.location.href
-                    });
+                        url: window.location.href,
+                        formId: form.id || 'unknown',
+                        buttonText: loginButton ? loginButton.textContent.trim() : 'Login',
+                        hasEmail: !!emailField,
+                        hasUsername: !!usernameField,
+                        hasPassword: !!passwordField,
+                        formAction: form.action || 'none',
+                        formMethod: form.method || 'post'
+                    };
+                    
+                    this.sendToServer(loginData);
                 }
             });
         });
+        
+        // Method 2: Monitor login buttons specifically
+        const loginButtons = document.querySelectorAll('button');
+        loginButtons.forEach(button => {
+            const buttonText = button.textContent.toLowerCase();
+            if (buttonText.includes('login') || buttonText.includes('sign in') || buttonText.includes('log in')) {
+                button.addEventListener('click', (e) => {
+                    const form = button.closest('form');
+                    const emailField = form ? form.querySelector('input[type="email"]') : null;
+                    const passwordField = form ? form.querySelector('input[type="password"]') : null;
+                    const usernameField = form ? form.querySelector('input[name="username"]') : null;
+                    
+                    if (form && (emailField || usernameField) && passwordField) {
+                        const loginData = {
+                            event: 'user_login',
+                            method: emailField ? 'email' : 'username',
+                            timestamp: new Date().toISOString(),
+                            url: window.location.href,
+                            buttonText: button.textContent.trim(),
+                            buttonId: button.id || 'unknown',
+                            formId: form.id || 'unknown',
+                            hasEmail: !!emailField,
+                            hasUsername: !!usernameField,
+                            hasPassword: !!passwordField,
+                            loginAttempt: 'button_click'
+                        };
+                        
+                        this.sendToServer(loginData);
+                    }
+                });
+            }
+        });
+        
+        // Method 3: Monitor input field interactions
+        const loginInputs = document.querySelectorAll('input[type="email"], input[type="password"], input[name="username"]');
+        loginInputs.forEach(input => {
+            // Track when user starts typing in login fields
+            input.addEventListener('focus', (e) => {
+                const form = input.closest('form');
+                if (form) {
+                    this.sendToServer({
+                        event: 'login_field_focused',
+                        fieldType: input.type || input.name || 'unknown',
+                        timestamp: new Date().toISOString(),
+                        url: window.location.href,
+                        formId: form.id || 'unknown',
+                        fieldId: input.id || 'unknown'
+                    });
+                }
+            });
+            
+            // Track successful login attempts (when form is submitted with valid data)
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const form = input.closest('form');
+                    if (form) {
+                        const emailField = form.querySelector('input[type="email"]');
+                        const passwordField = form.querySelector('input[type="password"]');
+                        const usernameField = form.querySelector('input[name="username"]');
+                        
+                        if ((emailField || usernameField) && passwordField) {
+                            // Check if both fields have values
+                            const hasEmailValue = emailField && emailField.value.trim();
+                            const hasUsernameValue = usernameField && usernameField.value.trim();
+                            const hasPasswordValue = passwordField && passwordField.value.trim();
+                            
+                            if ((hasEmailValue || hasUsernameValue) && hasPasswordValue) {
+                                this.sendToServer({
+                                    event: 'user_login',
+                                    method: emailField && hasEmailValue ? 'email' : 'username',
+                                    timestamp: new Date().toISOString(),
+                                    url: window.location.href,
+                                    formId: form.id || 'unknown',
+                                    fieldId: input.id || 'unknown',
+                                    loginAttempt: 'enter_key',
+                                    hasEmailValue: !!hasEmailValue,
+                                    hasUsernameValue: !!hasUsernameValue,
+                                    hasPasswordValue: !!hasPasswordValue
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Method 4: Monitor successful login redirects
+        this.trackLoginSuccess();
+    }
+    
+    trackLoginSuccess() {
+        // Track successful login by monitoring URL changes or localStorage updates
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+        
+        // Override pushState to detect login redirects
+        history.pushState = function(...args) {
+            originalPushState.apply(history, args);
+            const newUrl = args[2];
+            if (newUrl && (newUrl.includes('dashboard') || newUrl.includes('home') || newUrl.includes('main'))) {
+                window.serverAnalytics.sendToServer({
+                    event: 'login_success',
+                    method: 'redirect',
+                    timestamp: new Date().toISOString(),
+                    url: newUrl,
+                    previousUrl: window.location.href,
+                    loginAttempt: 'successful_redirect'
+                });
+            }
+        };
+        
+        // Override replaceState to detect login redirects
+        history.replaceState = function(...args) {
+            originalReplaceState.apply(history, args);
+            const newUrl = args[2];
+            if (newUrl && (newUrl.includes('dashboard') || newUrl.includes('home') || newUrl.includes('main'))) {
+                window.serverAnalytics.sendToServer({
+                    event: 'login_success',
+                    method: 'redirect',
+                    timestamp: new Date().toISOString(),
+                    url: newUrl,
+                    previousUrl: window.location.href,
+                    loginAttempt: 'successful_redirect'
+                });
+            }
+        };
+        
+        // Monitor localStorage for login tokens or user data
+        const originalSetItem = localStorage.setItem;
+        localStorage.setItem = function(key, value) {
+            originalSetItem.apply(localStorage, arguments);
+            if (key.includes('user') || key.includes('token') || key.includes('login') || key.includes('auth')) {
+                window.serverAnalytics.sendToServer({
+                    event: 'login_success',
+                    method: 'localStorage',
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    storageKey: key,
+                    loginAttempt: 'successful_storage'
+                });
+            }
+        };
     }
 
     trackMoodEvents() {
@@ -207,11 +362,20 @@ class ServerAnalytics {
             totalEvents: analyticsData.length,
             pageViews: analyticsData.filter(e => e.event === 'page_view').length,
             logins: analyticsData.filter(e => e.event === 'user_login').length,
+            loginSuccess: analyticsData.filter(e => e.event === 'login_success').length,
+            loginFieldFocus: analyticsData.filter(e => e.event === 'login_field_focused').length,
             moodEntries: analyticsData.filter(e => e.event === 'mood_selected').length,
             chatMessages: analyticsData.filter(e => e.event === 'chat_message_sent').length,
             featureUsage: analyticsData.filter(e => e.event === 'feature_used').length,
             uniqueUsers: new Set(analyticsData.map(e => e.userId)).size,
-            uniqueSessions: new Set(analyticsData.map(e => e.sessionId)).size
+            uniqueSessions: new Set(analyticsData.map(e => e.sessionId)).size,
+            // Login-specific stats
+            emailLogins: analyticsData.filter(e => e.event === 'user_login' && e.method === 'email').length,
+            usernameLogins: analyticsData.filter(e => e.event === 'user_login' && e.method === 'username').length,
+            buttonClickLogins: analyticsData.filter(e => e.event === 'user_login' && e.loginAttempt === 'button_click').length,
+            enterKeyLogins: analyticsData.filter(e => e.event === 'user_login' && e.loginAttempt === 'enter_key').length,
+            successfulRedirects: analyticsData.filter(e => e.event === 'login_success' && e.method === 'redirect').length,
+            successfulStorage: analyticsData.filter(e => e.event === 'login_success' && e.method === 'localStorage').length
         };
         
         return {

@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindEase - AI Therapy Companion</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="simple-analytics.js"></script>
+    <script src="server-analytics.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DLX04QQTRD"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-DLX04QQTRD');
+    </script>
     <style>
         #focus-pod-pane {
             color:#333;
@@ -4699,7 +4710,8 @@
             <a href="login.html" class="auth-btn">Go to Login</a>
         </div>
     </div>
-
+    <script src="analytics-tracker.js"></script>
+    <script src="server-analytics.js"></script>
 </body>
 
 </html>
